@@ -8,8 +8,7 @@
    "data": [
     "data/crm_tags.xml",
     "data/crm_stage_action.xml",
-    "data/crm_pipeline_wizard.xml"
-],
+    "data/crm_pipeline_wizard.xml",
     "installable": True,
     "application": False,
     "auto_install": False

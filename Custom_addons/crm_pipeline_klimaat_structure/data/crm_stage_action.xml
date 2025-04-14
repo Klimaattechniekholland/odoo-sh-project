@@ -1,21 +1,20 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <!-- Wizard Action -->
+    <!-- Wizard Actie -->
     <record id="action_generate_klimaat_pipeline" model="ir.actions.act_window">
-        <field name="name">Genereer Klimaat Pipeline</field>
+        <field name="name">Genereer CRM Pipeline</field>
         <field name="res_model">crm.pipeline.klimaat.wizard</field>
         <field name="view_mode">form</field>
         <field name="target">new</field>
     </record>
 
-    <!-- Menu Root voor Klimaatconfiguratie -->
+    <!-- Hoofdmenu Configuratie aanmaken -->
     <menuitem id="crm_menu_klimaat_config"
-              name="Klimaat Pipeline Configuratie"
-              parent="crm.crm_menu_root"
-              sequence="90"
-              groups="base.group_system"/>
+              name="Klimaat Pipeline"
+              parent="crm.crm_menu_config"
+              sequence="90" />
 
-    <!-- Submenu item dat de wizard opent -->
+    <!-- Submenu met actie -->
     <record id="crm_menu_generate_pipeline" model="ir.ui.menu">
         <field name="name">Genereer Klimaat Pipeline</field>
         <field name="parent_id" ref="crm_menu_klimaat_config"/>

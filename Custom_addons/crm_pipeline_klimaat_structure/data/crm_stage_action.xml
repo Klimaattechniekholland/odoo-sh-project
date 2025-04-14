@@ -1,24 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <odoo>
-    <!-- Hoofdmenu onder CRM -->
-    <record id="crm_menu_klimaat_config" model="ir.ui.menu">
-        <field name="name">Klimaatinstellingen</field>
-        <field name="parent_id" ref="crm.crm_menu_root"/>
-        <field name="sequence" eval="90"/>
-    </record>
-
-    <!-- Actie voor pipeline genereren -->
-    <record id="action_generate_klimaat_pipeline" model="ir.actions.server">
+    <!-- Wizard Action -->
+    <record id="action_generate_klimaat_pipeline" model="ir.actions.act_window">
         <field name="name">Genereer Klimaat Pipeline</field>
-        <field name="model_id" ref="crm.model_crm_stage"/>
-        <field name="state">code</field>
-        <field name="code">model.create_klimaat_pipeline()</field>
+        <field name="res_model">crm.pipeline.klimaat.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
     </record>
 
-    <!-- Submenu met actie onder Klimaatinstellingen -->
+    <!-- Menu Root voor Klimaatconfiguratie -->
+    <menuitem id="crm_menu_klimaat_config"
+              name="Klimaat Pipeline Configuratie"
+              parent="crm.crm_menu_root"
+              sequence="90"
+              groups="base.group_system"/>
+
+    <!-- Submenu item dat de wizard opent -->
     <record id="crm_menu_generate_pipeline" model="ir.ui.menu">
         <field name="name">Genereer Klimaat Pipeline</field>
         <field name="parent_id" ref="crm_menu_klimaat_config"/>
-        <field name="action_id" ref="action_generate_klimaat_pipeline"/>
+        <field name="action" ref="action_generate_klimaat_pipeline"/>
         <field name="sequence" eval="100"/>
     </record>
 </odoo>

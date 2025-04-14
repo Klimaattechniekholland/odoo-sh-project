@@ -1,5 +1,6 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <odoo>
+
     <!-- Wizard Actie -->
     <record id="action_generate_klimaat_pipeline" model="ir.actions.act_window">
         <field name="name">Genereer CRM Pipeline</field>
@@ -12,7 +13,7 @@
     <menuitem id="crm_menu_klimaat_config"
               name="Klimaat Pipeline"
               parent="crm.crm_menu_config"
-              sequence="90" />
+              sequence="90"/>
 
     <!-- Submenu met actie -->
     <record id="crm_menu_generate_pipeline" model="ir.ui.menu">
@@ -21,4 +22,5 @@
         <field name="action" ref="action_generate_klimaat_pipeline"/>
         <field name="sequence" eval="100"/>
     </record>
+
 </odoo>

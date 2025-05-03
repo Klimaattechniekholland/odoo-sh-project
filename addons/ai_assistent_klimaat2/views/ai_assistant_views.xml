@@ -1,0 +1,25 @@
+<odoo>
+    <record id="view_form_ai_assistant_config" model="ir.ui.view">
+        <field name="name">ai.assistant.config.form</field>
+        <field name="model">ai.assistant.config</field>
+        <field name="arch" type="xml">
+            <form string="AI Config">
+                <group>
+                    <field name="gpt_api_key"/>
+                    <field name="gemini_api_key"/>
+                </group>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_ai_assistant_config" model="ir.actions.act_window">
+        <field name="name">AI Assistent Config</field>
+        <field name="res_model">ai.assistant.config</field>
+        <field name="view_mode">form</field>
+        <field name="target">current</field>
+    </record>
+
+    <menuitem id="menu_ai_assistant_root" name="AI Assistent"/>
+    <menuitem id="menu_ai_assistant_config" parent="menu_ai_assistant_root"
+              name="Instellingen" action="action_ai_assistant_config"/>
+</odoo>

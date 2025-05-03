@@ -1,1 +1,0 @@
-// JavaScript placeholder for context tracking

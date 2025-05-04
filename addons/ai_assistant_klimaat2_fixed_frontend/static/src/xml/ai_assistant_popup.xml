@@ -1,0 +1,5 @@
+<templates xml:space="preserve">
+    <t t-name="ai_assistant_klimaat2.Popup">
+        <div>AI Assistant Popup Component</div>
+    </t>
+</templates>

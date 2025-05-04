@@ -1,0 +1,38 @@
+<odoo>
+    <record id="view_form_ai_assistant" model="ir.ui.view">
+        <field name="name">ai.assistant.form</field>
+        <field name="model">ai.assistant</field>
+        <field name="arch" type="xml">
+            <form string="AI Assistant">
+                <sheet>
+                    <group>
+                        <field name="name"/>
+                        <field name="prompt"/>
+                        <field name="result"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_tree_ai_assistant" model="ir.ui.view">
+        <field name="name">ai.assistant.tree</field>
+        <field name="model">ai.assistant</field>
+        <field name="arch" type="xml">
+            <tree string="AI Assistant">
+                <field name="name"/>
+                <field name="prompt"/>
+                <field name="result"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="action_ai_assistant" model="ir.actions.act_window">
+        <field name="name">AI Assistant</field>
+        <field name="res_model">ai.assistant</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+    <menuitem id="menu_ai_assistant_root" name="AI Assistant"/>
+    <menuitem id="menu_ai_assistant" name="Assistent" parent="menu_ai_assistant_root" action="action_ai_assistant"/>
+</odoo>

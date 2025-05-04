@@ -1,0 +1,2 @@
+run:
+  - python3 odoo-bin -d test_db -i ai_assistant_klimaat2 --stop-after-init

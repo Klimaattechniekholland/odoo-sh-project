@@ -1,0 +1,9 @@
+<odoo>
+  <templates xml:space="preserve">
+    <t t-name="ai_assistant_klimaat2.PopupButton">
+      <button type="button" class="btn btn-primary" t-on-click="start" title="AI Assistent">
+        <i class="fa fa-brain"/> AI
+      </button>
+    </t>
+  </templates>
+</odoo>

@@ -1,0 +1,4 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_ai_assistant,access_ai_assistant,model_ai_assistant,,1,0,0,0
+access_ai_user_context,access_ai_user_context,model_ai_user_context,,1,0,0,0
+access_ai_settings,access_ai_settings,model_res_config_settings,base.group_system,1,1,0,0

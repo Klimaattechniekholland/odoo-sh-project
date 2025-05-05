@@ -8,10 +8,6 @@
           <field name="openai_api_key"/>
           <field name="gemini_api_key"/>
         </group>
-        <footer>
-          <button type="object" name="execute" string="Save" class="btn-primary"/>
-          <button string="Discard" class="btn-secondary" special="cancel"/>
-        </footer>
       </form>
     </field>
   </record>

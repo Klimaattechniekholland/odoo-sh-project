@@ -15,6 +15,6 @@ class AIAssistantController(http.Controller):
             enriched = f"Context: model={model}, id={res_id} -- Vraag: {prompt}"
             antwoord = assistant.call_ai(enriched)
             return {'antwoord': antwoord}
-        except Exception as e:
+        except Exception:
             _logger.exception('AI call mislukt')
             return {'error': 'AI-service niet beschikbaar, probeer later opnieuw.'}

@@ -8,6 +8,10 @@
       <field name="name">AI User Context</field>
       <field name="model">ai.user.context</field>
     </record>
+    <record id="model_ai_prompt_wizard" model="ir.model">
+      <field name="name">AI Prompt Wizard</field>
+      <field name="model">ai.prompt.wizard</field>
+    </record>
     <record id="model_ai_assistant_command" model="ir.model">
       <field name="name">AI Assistant Command</field>
       <field name="model">ai.assistant.command</field>

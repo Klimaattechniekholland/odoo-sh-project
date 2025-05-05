@@ -1,0 +1,23 @@
+<odoo>
+  <record id="view_ai_prompt_wizard_form" model="ir.ui.view">
+    <field name="name">ai.prompt.wizard.form</field>
+    <field name="model">ai.prompt.wizard</field>
+    <field name="arch" type="xml">
+      <form string="AI Assistent">
+        <group>
+          <field name="prompt"/>
+        </group>
+        <footer>
+          <button string="Verstuur" type="object" name="action_send" class="btn-primary"/>
+          <button string="Annuleer" class="btn-secondary" special="cancel"/>
+        </footer>
+      </form>
+    </field>
+  </record>
+  <record id="action_ai_prompt_wizard" model="ir.actions.act_window">
+    <field name="name">AI Assistent</field>
+    <field name="res_model">ai.prompt.wizard</field>
+    <field name="view_mode">form</field>
+    <field name="target">new</field>
+  </record>
+</odoo>

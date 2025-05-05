@@ -5,7 +5,6 @@ from odoo.exceptions import UserError
 class AIAssistant(models.Model):
     _name = 'ai.assistant'
     _description = 'AI Developer Assistant'
-
     name = fields.Char(string='Naam', required=True)
 
     @api.model
@@ -13,7 +12,6 @@ class AIAssistant(models.Model):
         params = self.env['ir.config_parameter'].sudo()
         openai_key = params.get_param('ai_assistant.openai_key')
         gemini_key = params.get_param('ai_assistant.gemini_key')
-
         if openai_key:
             headers = {'Authorization': f'Bearer {openai_key}'}
             payload = {'model': 'gpt-4', 'messages': [{'role': 'user', 'content': prompt}]}

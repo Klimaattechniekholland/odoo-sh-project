@@ -3,7 +3,6 @@ from odoo.exceptions import ValidationError
 
 class AISettings(models.TransientModel):
     _inherit = 'res.config.settings'
-
     openai_api_key = fields.Char(string='OpenAI API Key', config_parameter='ai_assistant.openai_key')
     gemini_api_key = fields.Char(string='Gemini API Key', config_parameter='ai_assistant.gemini_key')
 

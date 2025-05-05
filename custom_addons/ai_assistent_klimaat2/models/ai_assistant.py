@@ -1,10 +1,11 @@
-import requests
 from odoo import models, fields, api
 from odoo.exceptions import UserError
+import requests
 
 class AIAssistant(models.Model):
-    _name = 'ai.assistant'
+    _name = 'x_ai_assistant'
     _description = 'AI Developer Assistant'
+
     name = fields.Char(string='Naam', required=True)
 
     @api.model

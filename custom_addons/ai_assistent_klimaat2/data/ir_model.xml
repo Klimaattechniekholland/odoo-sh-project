@@ -2,19 +2,19 @@
   <data noupdate="1">
     <record id="model_ai_assistant" model="ir.model">
       <field name="name">AI Assistant</field>
-      <field name="model">ai.assistant</field>
+      <field name="model">x_ai_assistant</field>
     </record>
     <record id="model_ai_user_context" model="ir.model">
       <field name="name">AI User Context</field>
-      <field name="model">ai.user.context</field>
+      <field name="model">x_ai_user_context</field>
     </record>
     <record id="model_ai_prompt_wizard" model="ir.model">
       <field name="name">AI Prompt Wizard</field>
-      <field name="model">ai.prompt.wizard</field>
+      <field name="model">x_ai_prompt_wizard</field>
     </record>
     <record id="model_ai_assistant_command" model="ir.model">
       <field name="name">AI Assistant Command</field>
-      <field name="model">ai.assistant.command</field>
+      <field name="model">x_ai_assistant_command</field>
     </record>
   </data>
 </odoo>

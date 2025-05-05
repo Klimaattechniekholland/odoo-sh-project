@@ -1,6 +1,6 @@
 {
     'name': 'AI Developer Assistent',
-    'version': '1.3',
+    'version': '1.4',
     'summary': 'Contextgevoelige AI-assistent voor Odoo v18 via Wizard',
     'category': 'Tools',
     'author': 'Klimaat Techniek Holland',

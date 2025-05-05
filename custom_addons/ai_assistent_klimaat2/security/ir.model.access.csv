@@ -1,6 +1,0 @@
-id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
-access_ai_assistant,access_ai_assistant,ai_assistent_klimaat2_wizard.model_ai_assistant,base.group_user,1,0,0,0
-access_ai_user_context,access_ai_user_context,ai_assistent_klimaat2_wizard.model_ai_user_context,base.group_user,1,0,0,0
-access_ai_prompt_wizard,access_ai_prompt_wizard,ai_assistent_klimaat2_wizard.model_ai_prompt_wizard,base.group_user,1,1,1,1
-access_ai_assistant_command,access_ai_assistant_command,ai_assistent_klimaat2_wizard.model_ai_assistant_command,base.group_user,1,0,0,0
-access_ai_settings,access_ai_settings,base.model_res_config_settings,base.group_system,1,1,0,0

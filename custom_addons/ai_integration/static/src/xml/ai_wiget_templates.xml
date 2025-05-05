@@ -1,0 +1,17 @@
+<odoo>
+    <templates xml:space="preserve">
+      <t t-name="ai_integration.AIWidget">
+        <div class="o_ai_widget">
+          <div class="form-group">
+            <label for="ai_prompt_input">Prompt:</label>
+            <textarea id="ai_prompt_input" class="o_ai_prompt_input form-control" rows="3" placeholder="Typ je vraag hier..."></textarea>
+          </div>
+          <button type="button" class="o_ai_send btn btn-primary mt-2">Verstuur naar AI</button>
+          <div class="o_ai_response alert alert-secondary mt-3" role="alert">
+            <!-- AI response verschijnt hier -->
+          </div>
+        </div>
+      </t>
+    </templates>
+  </odoo>
+  

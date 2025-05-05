@@ -1,0 +1,18 @@
+<odoo>
+  <record id="view_ai_config_form" model="ir.ui.view">
+    <field name="name">ai.integration.config.settings</field>
+    <field name="model">res.config.settings</field>
+    <field name="inherit_id" ref="base.res_config_settings_view_form"/>
+    <field name="arch" type="xml">
+      <sheet>
+        <group string="AI Integration">
+          <field name="api_key"/>
+        </group>
+        <group string="AI Chat">
+          <!-- HIER komt je widget -->
+          <div t-call="ai_integration.AIWidget"/>
+        </group>
+      </sheet>
+    </field>
+  </record>
+</odoo>

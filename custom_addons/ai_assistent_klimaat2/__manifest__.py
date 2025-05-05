@@ -5,7 +5,11 @@
     'category': 'Tools',
     'author': 'Klimaat Techniek Holland',
     'license': 'AGPL-3',
-    'depends': ['base', 'web', 'web_enterprise'],
+    'depends': [
+        'base',
+        'web',
+        'web_enterprise',
+    ],
     'data': [
         'data/ir_model.xml',
         'security/ir.model.access.csv',
@@ -14,8 +18,8 @@
     ],
     'assets': {
         'web.assets_backend': [
-            'static/src/js/ai_assistant_popup.js',
-            'static/src/xml/ai_assistant_popup.xml',
+            'ai_assistent_klimaat2/static/src/js/ai_assistant_popup.js',
+            'ai_assistent_klimaat2/static/src/xml/ai_assistant_popup.xml',
         ],
     },
     'application': False,

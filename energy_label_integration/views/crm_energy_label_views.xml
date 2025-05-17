@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <!-- Inherit CRM Lead form to add energy label fields in the 'Extra Info' tab -->
+    <record id="view_crm_lead_form_inherit_energy" model="ir.ui.view">
+        <field name="name">crm.lead.form.energylabel.inherit</field>
+        <field name="model">crm.lead</field>
+        <field name="inherit_id" ref="crm.crm_lead_view_form"/>
+        <field name="arch" type="xml">
+            <!-- Insert a new group in the Extra Info tab for energy label details -->
+            <xpath expr="//page[@name='extra_info']" position="inside">
+                <group string="Energy Label Information">
+                    <field name="energy_label_class" readonly="1"/>
+                    <field name="label_date" readonly="1"/>
+                    <field name="building_year" readonly="1"/>
+                    <field name="building_area" readonly="1"/>
+                </group>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Inherit Sale Order form to add energy label fields (Extra Info in Other Info tab) -->
+    <record id="view_sale_order_form_inherit_energy" model="ir.ui.view">
+        <field name="name">sale.order.form.energylabel.inherit</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_order_form"/>
+        <field name="arch" type="xml">
+            <!-- Add a group in the 'Other Information' tab for energy label info -->
+            <xpath expr="//page[@string='Other Information']" position="inside">
+                <group string="Energy Label Information">
+                    <field name="energy_label_class" readonly="1"/>
+                    <field name="label_date" readonly="1"/>
+                    <field name="building_year" readonly="1"/>
+                    <field name="building_area" readonly="1"/>
+                </group>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- ResConfigSettings view to expose the EP-Online API Key in the settings -->
+    <record id="view_res_config_settings_energylabel_form" model="ir.ui.view">
+        <field name="name">res.config.settings.energylabel.form</field>
+        <field name="model">res.config.settings</field>
+        <field name="inherit_id" ref="base.view_res_config_settings"/>
+        <field name="arch" type="xml">
+            <xpath expr="//div[@name='external_integration']" position="inside">
+                <div class="app_settings_block" name="energy_label_integration_settings" string="Energy Label Integration">
+                    <field name="ep_online_api_key" placeholder="Paste EP-Online API Key here"/>
+                    <label for="ep_online_api_key" string="EP-Online API Key" />
+                </div>
+            </xpath>
+        </field>
+    </record>
+</odoo>

@@ -5,29 +5,31 @@
         <field name="model">crm.lead</field>
         <field name="inherit_id" ref="crm.crm_lead_view_form"/>
         <field name="arch" type="xml">
-        <xpath expr="//page[@name='extra']" position="inside">
-            <group string="Energy Label Information">
-            <group>
-                <field name="zip"/>
-                <field name="energy_house_number"/>
-                <field name="energy_house_letter" placeholder="e.g. A"/>
-                <field name="energy_house_addition" placeholder="e.g. bis or 2"/>
-            </group>
-            <group>
-                <field name="energy_label_class"/>
-                <field name="energy_index"/>
-                <field name="energy_year_built"/>
-                <field name="energy_usable_area"/>
-            </group>
-            </group>
-        </xpath>
-        <xpath expr="//header" position="inside">
-            <button name="action_fetch_energy_data"
-                    type="object"
-                    string="Fetch Energy Data"
-                    class="btn btn-primary"
-                    help="Fetch energy label and building data from EP-Online/BAG APIs"/>
-        </xpath>
+            <xpath expr="//notebook/page[last()]" position="after">
+                <page name="energy_label_info" string="Energy Label Information">
+                    <group string="Energy Label Information">
+                        <group>
+                            <field name="zip"/>
+                            <field name="energy_house_number"/>
+                            <field name="energy_house_letter" placeholder="e.g. A"/>
+                            <field name="energy_house_addition" placeholder="e.g. bis or 2"/>
+                        </group>
+                        <group>
+                            <field name="energy_label_class"/>
+                            <field name="energy_index"/>
+                            <field name="energy_year_built"/>
+                            <field name="energy_usable_area"/>
+                        </group>
+                    </group>
+                </page>
+            </xpath>
+            <xpath expr="//header" position="inside">
+                <button name="action_fetch_energy_data"
+                        type="object"
+                        string="Fetch Energy Data"
+                        class="btn btn-primary"
+                        help="Fetch energy label and building data from EP-Online/BAG APIs"/>
+            </xpath>
         </field>
     </record>
 </odoo>

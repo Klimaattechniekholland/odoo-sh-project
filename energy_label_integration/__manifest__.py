@@ -18,9 +18,7 @@ and fetches data from EP-Online and BAG (PDOK) APIs.
         'data/crm_stages.xml',
         'views/energy_label_views.xml',
     ],
-    'demo': [
-        'demo/demo.xml',
-    ],
+    
     
     'installable': True,
     'application': False,

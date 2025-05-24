@@ -1,0 +1,59 @@
+<odoo>
+    <data>
+        <record id="view_crm_lead_form_inherit_energy" model="ir.ui.view">
+            <field name="name">crm.lead.form.energylabel.inherit</field>
+            <field name="model">crm.lead</field>
+            <field name="inherit_id" ref="crm.crm_lead_view_form"/>
+            <field name="arch" type="xml">
+                
+                <xpath expr="//notebook/page[last()]" position="after">
+                    <page string="Energy Label">
+                        <group> 
+                            <group string="Partner Address">
+                                <field name="partner_street"/>
+                                <field name="partner_zip"/>
+                                <field name="partner_city"/>
+                                <field name="partner_huisnummer"/>
+                                <field name="partner_huisletter"/>
+                                <field name="partner_toevoeging"/>
+                               
+                            </group>
+                            <group string="BAG Infos">
+                                <field name="bag_street"/>
+                                <field name="bag_city"/>
+                                <field name="bag_verblijfsobject_id"/>
+                                <field name="bag_usage"/>
+                            </group>
+                        </group>
+                        <group>
+                            
+                            <group string="EP Online Infos">
+                                <field name="ep_energy_label"/>
+                                <field name="ep_energy_index"/>
+                                <field name="ep_label_type"/>
+                                <field name="ep_validity_end"/>
+                            </group>
+                            <group>
+                                <button name="action_fetch_bag_api"
+                                    type="object"
+                                    string="Fetch BAG API"
+                                    class="btn-secondary"/>
+                                <button name="action_fetch_ep_online" 
+                                    string="Fetch EP-Online" 
+                                    type="object" 
+                                    class="btn-secondary"/>
+                                <button name="action_refresh_energy_label" 
+                                    string="Fetch Energy Data" 
+                                    type="object" 
+                                    class="btn-primary"/>
+
+
+                            </group>
+                        </group>
+                       
+                    </page>
+                </xpath>
+            </field>
+        </record>
+    </data>
+</odoo>

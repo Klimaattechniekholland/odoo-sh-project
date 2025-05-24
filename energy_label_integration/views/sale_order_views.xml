@@ -1,0 +1,30 @@
+<odoo>
+    <record id="view_sale_order_form_inherit_energy_label" model="ir.ui.view">
+        <field name="name">sale.order.form.energy_label</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_order_form"/>
+        <field name="arch" type="xml">
+             <xpath expr="//notebook/page[last()]" position="after">
+                <page string="Energy Label">
+                    <group>
+                        <button name="action_refresh_energy_label"
+                                string="Refresh Energy Label"
+                                type="object"
+                                class="btn-primary"/>
+                        <field name="ep_energy_label"/>
+                        <field name="ep_energy_index"/>
+                        <field name="ep_label_type"/>
+                        <field name="ep_validity_end"/>
+                    </group>
+                    <group>
+                        <field name="bag_street"/>
+                        <field name="bag_city"/>
+                        <field name="bag_verblijfsobject_id"/>
+                        <field name="bag_usage"/>
+                    </group>
+                  
+                </page>
+            </xpath>
+        </field>
+    </record>
+</odoo>

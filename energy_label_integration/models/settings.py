@@ -12,6 +12,6 @@ class ResConfigSettings(models.TransientModel):
     )
     bag_api_key = fields.Char(
         string="BAG API Key",
-        config_parameter="bag_api.api_key",
+        config_parameter="energy_label_integration.bag_api_key",
         help="API key for Kadaster BAG individual queries."
     )

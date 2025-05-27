@@ -14,11 +14,12 @@ with fallback and manual refresh, as per specification.
     'depends': ['base','crm','sale','contacts','sale_management',],
     'category': 'Sales/CRM',
     'external_dependencies': {
-    'python': ['httpx', 'pydantic'],
+    #'python': ['httpx', 'pydantic'],
     },
     'data': [
-        'security/ir.model.access.csv',
+        #'security/ir.model.access.csv',
         'data/stages.xml',
+        'data/system_parameters.xml',
         'views/crm_lead_views.xml',
         #'views/sale_order_views.xml',
         'views/res_partner_views.xml',
@@ -29,8 +30,8 @@ with fallback and manual refresh, as per specification.
     
     'installable': True,
     'application': False,
-    'auto_install': True,
+    'auto_install': False,
     # Define a post-init hook to fold default CRM stages after installing this module
-    #'post_init_hook': 'post_init_fold_facturatie'
+    'post_init_hook': 'hooks.post_init_hook',
 }
 

@@ -1,314 +1,189 @@
-# -*- coding: utf-8 -*-
-from odoo import models, fields
+from odoo import models, fields, api, _
 from odoo.exceptions import UserError
-from odoo.addons.energy_label_integration.services import bag_api_client, ep_online_client
+from ..services.bag_api_client import BagApiClient
+from ..services.ep_online_client import EpOnlineApiClient
+from ..utils.address_utils import parse_house_number
+import json
 import logging
 
 _logger = logging.getLogger(__name__)
 
-class CRMLead(models.Model):
+
+class CrmLead(models.Model):
     _inherit = 'crm.lead'
 
-    # EP-Online API fields
-    ep_energy_label = fields.Char(string="Energy Label", tracking=True)
-    ep_energy_index = fields.Float(string="Energy Index (EP)", tracking=True)
-    ep_label_type = fields.Char(string="Label Type", tracking=True)
-    ep_validity_end = fields.Date(string="Label Valid Until", tracking=True)
+    # Related partner address fields (editable)
+    partner_street = fields.Char(related='partner_id.street', string="Street", store=True, readonly=False)
+    partner_zip = fields.Char(related='partner_id.zip', string="Postcode", store=True, readonly=False)
+    partner_city = fields.Char(related='partner_id.city', string="City", store=True, readonly=False)
+    partner_huisnummer = fields.Char(related='partner_id.huisnummer', string="House Number", store=True, readonly=False)
+    partner_huisletter = fields.Char(related='partner_id.huisletter', string="House Letter", store=True, readonly=False)
+    partner_toevoeging = fields.Char(related='partner_id.huisnummertoevoeging', string="Number Addition", store=True, readonly=False)
 
-    # BAG API fields
-    bag_street = fields.Char(string="Street (BAG)", tracking=True)
-    bag_city = fields.Char(string="City (BAG)", tracking=True)
-    bag_verblijfsobject_id = fields.Char(string="BAG Verblijfsobject ID", tracking=True)
-    bag_usage = fields.Char(string="Usage (BAG)", tracking=True)
-    bag_construction_year = fields.Integer(string="Construction Year (BAG)", tracking=True)
+    # EP-Online fields
+    ep_energy_label = fields.Char(string='Energy Label', readonly=True)
+    ep_energy_index = fields.Float(string='Energy Index', readonly=True)
+    ep_label_type = fields.Char(string='Label Type', readonly=True)
+    ep_validity_end = fields.Date(string='Label Validity End', readonly=True)
+    ep_thermische_oppervlakte = fields.Float(string='Thermal Area (m²)', readonly=True)
 
-    # Related fields to display partner address directly on CRM lead
-    partner_street = fields.Char(related='partner_id.street', string="Street", store=True)
-    partner_zip = fields.Char(related='partner_id.zip', string="Postcode", store=True)
-    partner_city = fields.Char(related='partner_id.city', string="City", store=True)
-    partner_huisnummer = fields.Char(related='partner_id.huisnummer', string="House Number", store=True)
-    partner_huisletter = fields.Char(related='partner_id.huisletter', string="House Letter", store=True)
-    partner_toevoeging = fields.Char(related='partner_id.huisnummertoevoeging', string="Number Addition", store=True)
+    # BAG fields
+    bag_street = fields.Char(string='BAG Street', readonly=True)
+    bag_city = fields.Char(string='BAG City', readonly=True)
+    bag_verblijfsobject_id = fields.Char(string='BAG Address Object ID', readonly=True)
+    bag_usage = fields.Char(string='BAG Usage', readonly=True)
+    bag_construction_year = fields.Integer(string='BAG Construction Year', readonly=True)
+    bag_oppervlakte = fields.Float(string='BAG Area (m²)', readonly=True)
+
+    # Other fields
+    carbon_emissions = fields.Float(string='CO₂ Emissions (kg/year)', readonly=True)
+    api_raw_response = fields.Text(string='API Raw Response', readonly=True)
+    bag_raw_response = fields.Text(string='BAG Raw Response', readonly=True)
+
+
+    def _get_address_components(self):
+        postcode = (self.partner_zip or '').replace(" ", "").upper()
+        huisnummer = self.partner_huisnummer or ''
+        toevoeging = self.partner_toevoeging or ''
+        letter = self.partner_huisletter or ''
+        return postcode, huisnummer, toevoeging, letter
+
+    def _clear_energy_fields(self):
+        self.ep_energy_label = False
+        self.ep_energy_index = False
+        self.ep_label_type = False
+        self.ep_validity_end = False
+        self.ep_thermische_oppervlakte = False
+        self.bag_street = False
+        self.bag_city = False
+        self.bag_verblijfsobject_id = False
+        self.bag_usage = False
+        self.bag_construction_year = False
+        self.bag_oppervlakte = False
+        self.carbon_emissions = False
+        self.api_raw_response = False
+
+    def _fetch_all_data(self):
+        ep_client = self.env['ep.online.api.client']
+        bag_client = self.env['bag.api.client']
+
+        for lead in self:
+            postcode, huisnummer, toevoeging, letter = lead._get_address_components()
+            lead._clear_energy_fields()
+
+            if not huisnummer.isdigit():
+                raise UserError(f"Invalid house number: '{huisnummer}'")
+
+            ep_data = {}
+            bag_data = {}
+
+            try:
+                ep_data = ep_client.fetch_by_address(postcode, huisnummer, letter, toevoeging)
+                _logger.info("[EP] Data fetched by address: %s", ep_data)
+            except Exception as e:
+                _logger.warning("[EP] Fetch failed: %s", e)
+
+            try:
+                bag_data = bag_client.fetch_address(postcode, huisnummer, letter, toevoeging)
+                _logger.info("[BAG] Data fetched: %s", bag_data)
+            except Exception as e:
+                _logger.warning("[BAG] Fetch failed: %s", e)
+
+            if not ep_data and hasattr(bag_data, 'embedded') and bag_data.embedded.adressen:
+                vbo_id = bag_data.embedded.adressen[0].adresseerbaarObjectIdentificatie
+                try:
+                    ep_data = ep_client.fetch_by_address(postcode, huisnummer, letter, toevoeging, vbo_id)
+                    _logger.info("[EP] Retried with BAG ID: %s", ep_data)
+                except Exception as e:
+                    _logger.warning("[EP] Retry with BAG ID failed: %s", e)
+
+            lead._populate_ep_data(ep_data)
+            lead._populate_bag_data(bag_data)
+            try:
+                combined_data = {
+                    "ep_online": ep_data,
+                    "bag": bag_data
+                }
+                lead.api_raw_response = json.dumps(combined_data, indent=2, ensure_ascii=False)
+            
+            except Exception as e:
+                _logger.warning(f"Failed to dump combined API response: {e}")
+                lead.api_raw_response = str({"ep_online": ep_data, "bag": bag_data})
+            
+            #lead.api_raw_response = json.dumps(ep_data, indent=2, ensure_ascii=False)
+            #lead.bag_raw_response = json.dumps(bag_data, indent=2, ensure_ascii=False)
+
+
+    def _populate_ep_data(self, ep_data):
+        if not ep_data:
+            return
+    
+        self.ep_energy_label = ep_data.get('energielabel')
+        self.ep_energy_index = ep_data.get('energieindex')
+        self.ep_label_type = ep_data.get('labelType')
+        self.ep_validity_end = ep_data.get('geldigheidsdatum')
+        self.ep_thermische_oppervlakte = ep_data.get('thermische_oppervlakte')
+
+    def _populate_bag_data(self, bag_data):
+        if not bag_data or not hasattr(bag_data, 'embedded') or not bag_data.embedded.adressen:
+            return
+
+        adres = bag_data.embedded.adressen[0]
+
+        self.bag_street = adres.openbareRuimteNaam
+        self.bag_city = adres.woonplaatsNaam
+        self.bag_verblijfsobject_id = adres.adresseerbaarObjectIdentificatie
+        self.bag_usage = ', '.join(adres.gebruiksdoelen or [])
+        self.bag_construction_year = int(adres.oorspronkelijkBouwjaar[0]) if adres.oorspronkelijkBouwjaar else None
+        self.bag_oppervlakte = adres.oppervlakte
+
+        if self.partner_id:
+            if adres.openbareRuimteNaam:
+                self.partner_id.street = adres.openbareRuimteNaam
+            if adres.woonplaatsNaam:
+                self.partner_id.city = adres.woonplaatsNaam
 
     def write(self, vals):
-        res = super().write(vals)
+        trigger = False
         if 'stage_id' in vals:
-            for lead in self:
-                if lead.stage_id.name == 'Voorlopige Offerte':
-                    lead._fetch_energy_label(override=False)
+            new_stage = self.env['crm.stage'].browse(vals['stage_id'])
+            if new_stage and new_stage.name == 'Voorlopige Offerte':
+                trigger = True
+        res = super().write(vals)
+        if trigger:
+            self._fetch_all_data()
         return res
 
-    def action_fetch_ep_online(self):
-        """Manual trigger to fetch EP-Online data only."""
-        for lead in self:
-            lead._fetch_ep_online(override=True)
+    def action_fetch_data(self):
+        self._fetch_all_data()
+        return self._notify_user(_('Data Fetch'), _('EP-Online and BAG data fetched successfully.'))
 
-    def action_refresh_energy_label(self):
-        """Manual button to refresh energy label data."""
-        for lead in self:
-            lead._fetch_energy_label(override=True)
-
-
-
-    def action_fetch_bag_api(self):
-        """Call BAG API via service model and update lead + partner address fields."""
-        for lead in self:
-            partner = lead.partner_id
-            if not partner or not partner.zip or not partner.huisnummer:
-                raise UserError("Partner must have postcode and house number.")
-    
-            postcode = partner.zip.strip()
-            huisnummer = partner.huisnummer.strip()
-            huisletter = getattr(partner, 'huisletter', None)
-            toevoeging = getattr(partner, 'huisnummertoevoeging', None)
-    
-            bag_client = self.env['bag.api.client']
-    
-            try:
-                _logger.info(f"[BAG] Calling with postcode={postcode}, huisnummer={huisnummer}, huisletter={huisletter}, toevoeging={toevoeging}")
-                result = bag_client.fetch_address(
-                    postcode=postcode,
-                    huisnummer=huisnummer,
-                    huisletter=huisletter,
-                    huisnummertoevoeging=toevoeging,
-                )
-    
-                street = city = None
-    
-                # If AddressResponse (pydantic model) was returned
-                if hasattr(result, 'embedded') and result.embedded.adressen:
-                    adres = result.embedded.adressen[0]
-                    street = adres.openbareRuimteNaam
-                    city = adres.woonplaatsNaam
-                    lead.bag_street = street
-                    lead.bag_city = city
-                    lead.bag_verblijfsobject_id = adres.adresseerbaarObjectIdentificatie
-                    lead.bag_usage = ', '.join(adres.gebruiksdoelen or [])
-                    if adres.oorspronkelijkBouwjaar and adres.oorspronkelijkBouwjaar[0].isdigit():
-                        lead.bag_construction_year = int(adres.oorspronkelijkBouwjaar[0])
-    
-                # If raw dict (OGC fallback) was returned
-                elif isinstance(result, dict) and 'features' in result and result['features']:
-                    props = result['features'][0].get('properties', {})
-                    street = props.get('openbareRuimteNaam')
-                    city = props.get('woonplaatsNaam')
-                    lead.bag_street = street
-                    lead.bag_city = city
-                    lead.bag_verblijfsobject_id = props.get('identificatie')
-                    lead.bag_usage = props.get('gebruiksdoelVerblijfsobject', '')
-                    bouwjaar = props.get('bouwjaar')
-                    if bouwjaar and bouwjaar.isdigit():
-                        lead.bag_construction_year = int(bouwjaar)
-                else:
-                    raise UserError("BAG API returned no valid data.")
-    
-                #  Update partner address too
-                if street:
-                    partner.street = street
-                if city:
-                    partner.city = city
-    
-                return {
-                    'type': 'ir.actions.client',
-                    'tag': 'display_notification',
-                    'params': {
-                        'title': "BAG API Success",
-                        'message': f"Lead & partner updated. Street: {street}, City: {city}",
-                        'sticky': False,
-                    }
-                }
-    
-            except Exception as e:
-                _logger.exception("[BAG] Error occurred")
-                raise UserError(f"BAG API error: {str(e)}")
-
-
-    def _fetch_ep_online(self, override=False):
-        """Fetch energy label data from EP-Online API (custom format) and update lead fields."""
-        import httpx
-        from datetime import datetime
-        from odoo.exceptions import UserError
-    
-        partner = self.partner_id
-        if not partner or not partner.zip or not partner.huisnummer:
-            raise UserError("Partner must have postcode and house number.")
-    
-        postcode = partner.zip.strip()
-        huisnummer = int(partner.huisnummer.strip())
-        huisletter = getattr(partner, 'huisletter', None)
-    
-        token = self.env['ir.config_parameter'].sudo().get_param('energy_label_integration.ep_online_api_key')
-        if not token:
-            raise UserError("EP-Online API key is not configured.")
-    
-        headers = {
-            "Authorization": token,
-        }
-        params = {
-            "postcode": postcode,
-            "huisnummer": huisnummer,
-        }
-        if huisletter:
-            params["huisletter"] = huisletter
-    
-        url = "https://public.ep-online.nl/api/v5/PandEnergielabel/Adres"
-    
+    def action_test_ep(self):
         try:
-            with httpx.Client(timeout=10.0) as client:
-                _logger.info(f"[EP-Online] Requesting with params: {params}")
-                response = client.get(url, headers=headers, params=params)
-                response.raise_for_status()
-    
-            data = response.json()
-            _logger.debug(f"[EP-Online] Raw JSON: {data}")
-    
-            if not isinstance(data, list) or not data:
-                raise UserError("No energy label found via EP-Online.")
-    
-            label = data[0]
-            _logger.info(f"[EP-Online] First label entry: {label}")
-    
-            energy_label = label.get('Energieklasse')
-            energy_index = label.get('BerekendeEnergieverbruik')  # Optional/approximation
-            label_type = label.get('Berekeningstype')
-            validity_raw = label.get('Geldig_tot')
-    
-            validity_date = None
-            if validity_raw:
-                try:
-                    validity_date = datetime.fromisoformat(validity_raw).date()
-                except Exception:
-                    _logger.warning(f"[EP-Online] Invalid date format for Geldig_tot: {validity_raw}")
-    
-            if override or not self.ep_energy_label:
-                self.ep_energy_label = energy_label
-            if override or not self.ep_energy_index:
-                self.ep_energy_index = float(energy_index) if energy_index else None
-            if override or not self.ep_label_type:
-                self.ep_label_type = label_type
-            if override or not self.ep_validity_end:
-                self.ep_validity_end = validity_date
-    
-        except httpx.HTTPStatusError as e:
-            _logger.error(f"[EP-Online] HTTP {e.response.status_code}: {e.response.text}")
-            raise UserError(f"EP-Online request failed with status {e.response.status_code}")
+            postcode, huisnummer, toevoeging, letter = self._get_address_components()
+            ep_data = self.env['ep.online.api.client'].fetch_by_address(postcode, huisnummer, letter, toevoeging)
+            self._populate_ep_data(ep_data)
+            return self._notify_user(_('EP-Online Test'), _('EP-Online data fetched successfully.'))
         except Exception as e:
-            _logger.exception("[EP-Online] Unexpected error")
-            raise UserError(f"EP-Online failed: {str(e)}")
+            raise UserError(_('EP-Online API test failed: %s') % e)
 
-
-
-
-    def _fetch_energy_label(self, override=False):
-        """Fetch data from BAG (for address) and EP-Online (for energy label) APIs."""
-        import httpx
-        from datetime import datetime
-    
-        partner = self.partner_id
-        if not partner or not partner.zip or not partner.huisnummer:
-            raise UserError("Partner must have postcode and house number.")
-    
-        postcode = partner.zip.strip()
-        huisnummer = partner.huisnummer.strip()
-        huisletter = getattr(partner, 'huisletter', None)
-        toevoeging = getattr(partner, 'huisnummertoevoeging', None)
-    
-        # Step 1 — Call BAG API
+    def action_test_bag(self):
         try:
-            bag_client = self.env['bag.api.client']
-            result = bag_client.fetch_address(
-                postcode=postcode,
-                huisnummer=huisnummer,
-                huisletter=huisletter,
-                huisnummertoevoeging=toevoeging,
-            )
-    
-            street = city = None
-    
-            if hasattr(result, 'embedded') and result.embedded.adressen:
-                adres = result.embedded.adressen[0]
-                street = adres.openbareRuimteNaam
-                city = adres.woonplaatsNaam
-                self.bag_street = street
-                self.bag_city = city
-                self.bag_verblijfsobject_id = adres.adresseerbaarObjectIdentificatie
-                self.bag_usage = ', '.join(adres.gebruiksdoelen or [])
-                if adres.oorspronkelijkBouwjaar and adres.oorspronkelijkBouwjaar[0].isdigit():
-                    self.bag_construction_year = int(adres.oorspronkelijkBouwjaar[0])
-    
-            elif isinstance(result, dict) and 'features' in result and result['features']:
-                props = result['features'][0].get('properties', {})
-                street = props.get('openbareRuimteNaam')
-                city = props.get('woonplaatsNaam')
-                self.bag_street = street
-                self.bag_city = city
-                self.bag_verblijfsobject_id = props.get('identificatie')
-                self.bag_usage = props.get('gebruiksdoelVerblijfsobject', '')
-                bouwjaar = props.get('bouwjaar')
-                if bouwjaar and bouwjaar.isdigit():
-                    self.bag_construction_year = int(bouwjaar)
-            else:
-                _logger.warning("[BAG] No usable data returned.")
-    
-            #  Also update partner address
-            if street:
-                partner.street = street
-            if city:
-                partner.city = city
-    
+            postcode, huisnummer, toevoeging, letter = self._get_address_components()
+            bag_data = self.env['bag.api.client'].fetch_address(postcode, huisnummer, letter, toevoeging)
+            self._populate_bag_data(bag_data)
+            return self._notify_user(_('BAG Test'), _('BAG data fetched successfully.'))
         except Exception as e:
-            _logger.warning(f"[BAG] Failed silently: {e}")
-    
-        # Step 2 — Call EP-Online API (based on actual structure)
-        try:
-            token = self.env['ir.config_parameter'].sudo().get_param('energy_label_integration.ep_online_api_key')
-            if not token:
-                raise UserError("EP-Online API key is not configured.")
-    
-            headers = {"Authorization": token}
-            ep_url = "https://public.ep-online.nl/api/v5/PandEnergielabel/Adres"
-            ep_params = {
-                "postcode": postcode,
-                "huisnummer": huisnummer,
+            raise UserError(_('BAG API test failed: %s') % e)
+
+    def _notify_user(self, title, message):
+        return {
+            'type': 'ir.actions.client',
+            'tag': 'display_notification',
+            'params': {
+                'title': title,
+                'message': message,
+                'type': 'success',
+                'sticky': False
             }
-            if huisletter:
-                ep_params["huisletter"] = huisletter
-    
-            with httpx.Client(timeout=10.0) as client:
-                _logger.info(f"[EP-Online] Requesting with: {ep_params}")
-                response = client.get(ep_url, headers=headers, params=ep_params)
-                response.raise_for_status()
-    
-            data = response.json()
-            if not isinstance(data, list) or not data:
-                raise UserError("No energy label found via EP-Online.")
-    
-            label = data[0]
-            _logger.info(f"[EP-Online] Found label: {label}")
-    
-            energy_label = label.get('Energieklasse')
-            energy_index = label.get('BerekendeEnergieverbruik')
-            label_type = label.get('Berekeningstype')
-            validity_raw = label.get('Geldig_tot')
-    
-            validity_date = None
-            if validity_raw:
-                try:
-                    validity_date = datetime.fromisoformat(validity_raw).date()
-                except Exception:
-                    _logger.warning(f"[EP-Online] Invalid date: {validity_raw}")
-    
-            if override or not self.ep_energy_label:
-                self.ep_energy_label = energy_label
-            if override or not self.ep_energy_index:
-                self.ep_energy_index = float(energy_index) if energy_index else None
-            if override or not self.ep_label_type:
-                self.ep_label_type = label_type
-            if override or not self.ep_validity_end:
-                self.ep_validity_end = validity_date
-    
-        except Exception as e:
-            _logger.exception("[EP-Online] Failed")
-            raise UserError(f"EP-Online failed: {str(e)}")
-
-
+        }

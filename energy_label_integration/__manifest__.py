@@ -20,7 +20,7 @@ with fallback and manual refresh, as per specification.
         #'security/ir.model.access.csv',
         'data/stages.xml',
         'data/system_parameters.xml',
-        'views/crm_lead_views.xml',
+        #'views/crm_lead_views.xml',
         #'views/sale_order_views.xml',
         'views/res_partner_views.xml',
         'views/settings_views.xml',
@@ -30,7 +30,7 @@ with fallback and manual refresh, as per specification.
     
     'installable': True,
     'application': False,
-    'auto_install': False,
+    'auto_install': True,
     # Define a post-init hook to fold default CRM stages after installing this module
     'post_init_hook': 'hooks.post_init_hook',
 }

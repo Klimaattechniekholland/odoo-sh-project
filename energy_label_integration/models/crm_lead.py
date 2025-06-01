@@ -20,26 +20,35 @@ class CrmLead(models.Model):
     partner_huisletter = fields.Char(related='partner_id.huisletter', string="House Letter", store=True, readonly=False)
     partner_toevoeging = fields.Char(related='partner_id.huisnummertoevoeging', string="Number Addition", store=True, readonly=False)
 
+    # Manual override flag
+    energy_data_manual_override = fields.Boolean(string='Manual Override')
+
     # EP-Online fields
-    ep_energy_label = fields.Char(string='Energy Label', readonly=True)
-    ep_energy_index = fields.Float(string='Energy Index', readonly=True)
-    ep_label_type = fields.Char(string='Label Type', readonly=True)
-    ep_validity_end = fields.Date(string='Label Validity End', readonly=True)
-    ep_thermische_oppervlakte = fields.Float(string='Thermal Area (m²)', readonly=True)
+    ep_energy_label = fields.Char(string='Energy Label')
+    ep_energy_index = fields.Float(string='Energy Index')
+    ep_label_type = fields.Char(string='Label Type')
+    ep_validity_end = fields.Date(string='Label Validity End')
+    ep_thermische_oppervlakte = fields.Float(string='Thermal Area (m²)')
 
     # BAG fields
-    bag_street = fields.Char(string='BAG Street', readonly=True)
-    bag_city = fields.Char(string='BAG City', readonly=True)
-    bag_verblijfsobject_id = fields.Char(string='BAG Address Object ID', readonly=True)
-    bag_usage = fields.Char(string='BAG Usage', readonly=True)
-    bag_construction_year = fields.Integer(string='BAG Construction Year', readonly=True)
-    bag_oppervlakte = fields.Float(string='BAG Area (m²)', readonly=True)
+    bag_street = fields.Char(string='BAG Street')
+    bag_city = fields.Char(string='BAG City')
+    bag_verblijfsobject_id = fields.Char(string='BAG Address Object ID')
+    bag_usage = fields.Char(string='BAG Usage')
+    bag_construction_year = fields.Integer(string='BAG Construction Year')
+    bag_oppervlakte = fields.Float(string='BAG Area (m²)')
 
     # Other fields
-    carbon_emissions = fields.Float(string='CO₂ Emissions (kg/year)', readonly=True)
-    api_raw_response = fields.Text(string='API Raw Response', readonly=True)
-    bag_raw_response = fields.Text(string='BAG Raw Response', readonly=True)
+    carbon_emissions = fields.Float(string='CO₂ Emissions (kg/year)')
+    api_raw_response = fields.Text(string='API Raw Response')
 
+    def to_serializable(obj):
+        if hasattr(obj, "model_dump"):
+            return obj.model_dump()
+        elif hasattr(obj, "__dict__"):
+            return obj.__dict__
+        else:
+            return str(obj)
 
     def _get_address_components(self):
         postcode = (self.partner_zip or '').replace(" ", "").upper()
@@ -68,6 +77,9 @@ class CrmLead(models.Model):
         bag_client = self.env['bag.api.client']
 
         for lead in self:
+            if lead.energy_data_manual_override:
+                continue
+
             postcode, huisnummer, toevoeging, letter = lead._get_address_components()
             lead._clear_energy_fields()
 
@@ -99,25 +111,23 @@ class CrmLead(models.Model):
 
             lead._populate_ep_data(ep_data)
             lead._populate_bag_data(bag_data)
+
             try:
                 combined_data = {
                     "ep_online": ep_data,
-                    "bag": bag_data
+                    "bag": to_serializable(bag_data)
                 }
-                lead.api_raw_response = json.dumps(combined_data, indent=2, ensure_ascii=False)
-            
+                lead.api_raw_response = f"<pre>{json.dumps(combined_data, indent=2, ensure_ascii=False)}</pre>"
             except Exception as e:
-                _logger.warning(f"Failed to dump combined API response: {e}")
-                lead.api_raw_response = str({"ep_online": ep_data, "bag": bag_data})
-            
-            #lead.api_raw_response = json.dumps(ep_data, indent=2, ensure_ascii=False)
-            #lead.bag_raw_response = json.dumps(bag_data, indent=2, ensure_ascii=False)
-
+                _logger.warning(f"Failed to serialize combined API data: {e}")
+                lead.api_raw_response = str({
+                    "ep_online": str(ep_data),
+                    "bag": str(bag_data)
+                })
 
     def _populate_ep_data(self, ep_data):
         if not ep_data:
             return
-    
         self.ep_energy_label = ep_data.get('energielabel')
         self.ep_energy_index = ep_data.get('energieindex')
         self.ep_label_type = ep_data.get('labelType')
@@ -129,7 +139,6 @@ class CrmLead(models.Model):
             return
 
         adres = bag_data.embedded.adressen[0]
-
         self.bag_street = adres.openbareRuimteNaam
         self.bag_city = adres.woonplaatsNaam
         self.bag_verblijfsobject_id = adres.adresseerbaarObjectIdentificatie
@@ -144,6 +153,9 @@ class CrmLead(models.Model):
                 self.partner_id.city = adres.woonplaatsNaam
 
     def write(self, vals):
+        if 'energy_data_manual_override' in vals and vals['energy_data_manual_override']:
+            return super().write(vals)
+
         trigger = False
         if 'stage_id' in vals:
             new_stage = self.env['crm.stage'].browse(vals['stage_id'])

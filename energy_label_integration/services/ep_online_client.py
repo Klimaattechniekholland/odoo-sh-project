@@ -41,10 +41,9 @@ class EpOnlineApiClient(models.AbstractModel):
     
             if not data:
                 raise UserError("No data returned from EP-Online.")
-    
+
             # handle list or dict
             main_data = data[0] if isinstance(data, list) else data
-    
             return {
                 'thermische_oppervlakte': main_data.get('Gebruiksoppervlakte_thermische_zone'),
                 'energielabel': main_data.get('energielabel') or main_data.get('Energieklasse'),

@@ -1,4 +1,3 @@
-# hooks.py
 from odoo import api, SUPERUSER_ID
 
 def post_init_hook(cr, registry):

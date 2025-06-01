@@ -1,0 +1,17 @@
+<odoo>
+    <record id="view_res_partner_form_inherit_huisnummer" model="ir.ui.view">
+        <field name="name">res.partner.form.inherit.huisnummer</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="base.view_partner_form"/>
+        <field name="arch" type="xml">
+
+            <xpath expr="//div[hasclass('o_address_format')]/field[@name='street']" 
+                position="after">
+                <field name="huisnummer" placeholder="House number"/>
+                <field name="huisletter" placeholder="House letter"/>
+                <field name="huisnummertoevoeging" placeholder="Addition"/>
+            </xpath>
+
+        </field>
+    </record>
+</odoo>

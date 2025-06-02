@@ -22,7 +22,7 @@ with fallback and manual refresh, as per specification.
         'data/system_parameters.xml',
         #'views/crm_lead_views.xml',
         #'views/sale_order_views.xml',
-        'views/res_partner_views.xml',
+        #'views/res_partner_views.xml',
         'views/settings_views.xml',
     ],
   

@@ -32,6 +32,6 @@ with fallback and manual refresh, as per specification.
     'application': False,
     'auto_install': True,
     # Define a post-init hook to fold default CRM stages after installing this module
-    'post_init_hook': 'hooks.post_init_hook',
+    #'post_init_hook': 'hooks.post_init_hook',
 }
 

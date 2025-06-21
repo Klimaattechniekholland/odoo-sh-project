@@ -1,6 +1,6 @@
 import logging
 import httpx
-from odoo import models
+from odoo.addons.bag_ep_api.services.api_calls.base_resolver import BaseEpResolver
 from odoo.addons.bag_ep_api.services.base_models.bag_basemodel import \
 	AddressResponse  # Ensure this returns a data class or parsed dict
 
@@ -12,13 +12,61 @@ class BagApiClientError(Exception):
 	"""Custom error for BAG_API_client."""
 
 
-class BagApiClient(models.AbstractModel):
-	_name = "bag.api.client"
-	_description = "BAG API Client"
+class BagApiResolver(BaseEpResolver):
+	def _init_client(self):
+		return BagApiClient(self.env)
+	
+	
+	def _call_api(self, partner):
+		return self.client.fetch_address(
+			postcode = partner.zip.replace(' ', ''),
+			huisnummer = partner.house_number,
+			huisletter = partner.house_letter,
+			huisnummertoevoeging = partner.house_number_addition,
+			)
+	
+
+	def _source_prefix(self):
+		return "BAG"
+
+	def apply_from_data(self, bag_data):
+		if not bag_data:
+			return None
+		
+		embedded = getattr(bag_data, "embedded", None)
+		adressen = getattr(embedded, "adressen", None) if embedded else None
+
+		if not embedded or not adressen:
+			_logger.warning(f"[BAG] No address found for {self.partner.name}.")
+			self._warnings.append(
+				f"BAG — No addresses found for zip '{self.partner.zip}' "
+				f"and number '{self.partner.full_house_number}'."
+				)
+			return None
+		
+		if len(adressen) > 1:
+			_logger.warning(f"[BAG] Multiple addresses found for {self.partner.name}.")
+			self._warnings.append(
+				f"BAG — Multiple addresses found for zip '{self.partner.zip}' "
+				f"and number '{self.partner.full_house_number}'."
+				)
+			return None
+		
+		adres = adressen[0]
+		self.partner.addressable_object = adres.adresseerbaarObjectIdentificatie
+		self.partner.ep_lookup_status = 2
+		_logger.info(f"[BAG] Autofill completed for {self.partner.name}.")
+		
+		return adres
+		
+
+class BagApiClient:
 	
 	#  next option to set to more adressen, need to add a new view for selection
 	MODEL = "adressenuitgebreid"
-	
+
+	def __init__(self, env = None):
+		self.env = env
 	
 	def _get_headers(self):
 		"""Fetch API_key and set required headers."""
@@ -43,6 +91,7 @@ class BagApiClient(models.AbstractModel):
 	# 		).strip() or "https://api.bag.kadaster.nl/lvbag/individuelebevragingen/v2/"
 	# 		# ensure that the last '/' is set
 	# 	return api_url.rstrip('/') + '/'
+	
 	
 	def _get_exact_match(self):
 		api_exact_match = self.env['ir.config_parameter'].sudo().with_context(

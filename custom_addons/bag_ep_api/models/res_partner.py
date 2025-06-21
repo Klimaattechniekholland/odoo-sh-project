@@ -1,13 +1,16 @@
 from odoo import models, fields, api, _
 import logging
 import re
-from odoo.addons.bag_ep_api.utils.buffer_manager import BufferManager
+from odoo.addons.bag_ep_api.services.api_calls.resolver_manager import ResolverManager
+from odoo.addons.bag_ep_api.services.api_calls.zip_api_client import ZipApiResolver
 from odoo.addons.bag_ep_api.utils.filter_model_fields import filter_model_fields
+from odoo.addons.bag_ep_api.utils.warning_manager import WarningManager
 from ..utils.format_dutch_zip import format_dutch_zip
 from odoo.exceptions import UserError, ValidationError
 
 
 _logger = logging.getLogger(__name__)
+wm = WarningManager()
 
 
 class ResPartner(models.Model):
@@ -51,6 +54,7 @@ class ResPartner(models.Model):
 	house_number = fields.Integer(string = 'Number', readonly = True)
 	house_letter = fields.Char(string = 'Letter', size = 1, readonly = True)
 	house_number_addition = fields.Integer(string = 'Addition', readonly = True)
+	
 	addressable_object = fields.Char(string = "Addressable Object", readonly = True)
 	
 	ep_lookup_status = fields.Integer(string = "EP Lookup status", default = 0)
@@ -79,8 +83,10 @@ class ResPartner(models.Model):
 	def create(self, vals_list):
 		partners = super().create(vals_list)
 		for partner in partners:
-			parsed = BufferManager.get()
 			
+			# todo: cache call
+			parsed = None
+
 			if parsed and not partner.parent_id:
 				filtered_vals = filter_model_fields(self.env, 'ep.data', parsed.model_dump())
 				ep_data_model = self.env['ep.data']
@@ -90,7 +96,6 @@ class ResPartner(models.Model):
 						**filtered_vals
 						}
 					)
-			BufferManager.clear()
 		
 		return partners
 	
@@ -99,7 +104,8 @@ class ResPartner(models.Model):
 		result = super().write(vals)
 		
 		for partner in self:
-			parsed = BufferManager.get()
+			# todo: cache call
+			parsed = None
 			
 			if parsed and not partner.parent_id:
 				filtered_vals = filter_model_fields(self.env, 'ep.data', parsed.model_dump())
@@ -115,7 +121,6 @@ class ResPartner(models.Model):
 							**filtered_vals
 							}
 						)
-			BufferManager.clear()
 		
 		return result
 	
@@ -146,18 +151,19 @@ class ResPartner(models.Model):
 				record.city = ''
 				record.state_id = False
 				
-				warnings.append(
-					f"ZIP -- Invalid ZIP Code: '{record.zip}' "
-					f"Please use format '1234 AB' or '1234AB'.."
+				wm.add(
+					"warning", _("ZIP -- Invalid ZIP Code: '%(zip)s'. Please use format '1234 AB' or '1234AB'.") % {
+						'zip': record.zip
+						}
 					)
 		
 		if not warnings:
-			self._call_api_lookups(warnings)
+			fetched_data, warnings = ResolverManager(self).resolve_all(warnings)
 			
 			return self._handle_onchange_result(
 				warnings = warnings,
 				model_name = 'ep.data',
-				buffer_model = BufferManager,
+				data_model = fetched_data,
 				ep_lookup_status = self.ep_lookup_status,
 				)
 		
@@ -193,14 +199,17 @@ class ResPartner(models.Model):
 			
 			if not warnings:
 				if partner.parent_id:
-					self._zip_auto_fill_address_sync(warnings)
+					zip_data, warnings = ZipApiResolver(self).get(warnings)
+					
+					if not warnings:
+						ZipApiResolver(self).apply_from_data(zip_data)
 				else:
-					partner._call_api_lookups(warnings)
+					fetched_data, warnings = ResolverManager(self).resolve_all(warnings)
 			
 			return self._handle_onchange_result(
 				warnings = warnings,
 				model_name = 'ep.data',
-				buffer_model = BufferManager,
+				data_model = fetched_data,
 				ep_lookup_status = self.ep_lookup_status,
 				)
 		
@@ -233,7 +242,7 @@ class ResPartner(models.Model):
 						record.full_house_number = full_number
 	
 	
-	def _handle_onchange_result(self, warnings = None, model_name = None, buffer_model = None, ep_lookup_status = None):
+	def _handle_onchange_result(self, warnings = None, model_name = None, data_model = None, ep_lookup_status = None):
 		#
 		# Optionally recreate One2many values from buffer.
 		# This will display directly the information without pressing the "write" button.
@@ -241,19 +250,20 @@ class ResPartner(models.Model):
 		# Need to set the delete to cascade then there will be no records with empty partner_id.
 		#
 		result = {}
-		if self._get_recreate() and buffer_model and model_name and ep_lookup_status > 1:
+		if self._get_recreate() and data_model and model_name and ep_lookup_status > 1:
 			# delete ep.data records linked to the partner - self
+			
 			self.ep_data_ids = [(6, 0, [])]
-			parsed = buffer_model.get()
+			parsed = data_model
 			if parsed:
 				filtered_vals = filter_model_fields(self.env, model_name, parsed.model_dump())
 				# create a new ep.data record linked to the partner - self
 				self.ep_data_ids = [(0, 0, filtered_vals)]
 				result.setdefault('value', {})['ep_data_ids'] = self.ep_data_ids
-			BufferManager.clear()
+		# BufferManager.clear()
 		
 		# Show a warning message if needed
-		if warnings and self._get_show_warnings():
+		if warnings:
 			result['warning'] = {
 				'title': " -- Warning -- ",
 				'message': "\n".join(warnings),
@@ -269,13 +279,7 @@ class ResPartner(models.Model):
 		return api_recreate
 	
 	
-	def _get_show_warnings(self):
-		api_show_warnings = self.env['ir.config_parameter'].sudo().with_context(
-			company_id = self.env.company.id
-			).get_param(
-			'bag_ep_api.ep_api_show_warnings', default = ''
-			).strip() or False
-		return api_show_warnings
+	wm = WarningManager()
 	
 	
 	def _get_level_warnings(self):
@@ -311,17 +315,6 @@ class ResPartner(models.Model):
 		return None
 	
 	
-	def _call_api_lookups(self, warnings):
-		
-		self._zip_auto_fill_address_sync(warnings)
-		if not warnings:
-			self._bag_auto_fill_address_sync(warnings)
-		if not warnings:
-			self._ep_auto_fill_address_sync(warnings)
-		
-		return warnings
-	
-	
 	def action_reset_to_defaults(self):
 		exclude_fields = {'id', 'create_uid', 'create_date', 'write_uid', 'write_date'}
 		field_names = [f for f in self.fields_get().keys() if f not in exclude_fields]
@@ -334,7 +327,8 @@ class ResPartner(models.Model):
 	def action_ep_api_lookup(self):
 		"""Manual BAG fetch from the UI button."""
 		for partner in self:
-			parsed = BufferManager.get()
+			# todo: cache call
+			parsed = None
 			if parsed:
 				filtered_vals = filter_model_fields(self.env, 'ep.data', parsed.model_dump())
 				ep_data_model = self.env['ep.data']
@@ -356,121 +350,3 @@ class ResPartner(models.Model):
 			match.group(2) if match.group(2) else None,
 			int(match.group(3)) if match.group(3) else None
 			)
-	
-	
-	def _zip_auto_fill_address_sync(self, warnings):
-		"""Synchronous ZIP address autofill."""
-		for partner in self:
-			if not partner.zip or not partner.full_house_number:
-				pass
-			else:
-				zip_client = self.env['zip.api.client']
-				try:
-					
-					zip_response = zip_client.fetch_address(  # sync method required
-						zipcode = partner.zip,
-						full_house_number = partner.full_house_number,
-						)
-					if zip_response:
-						state = self.env['res.country.state'].search(
-							[
-								('name', 'ilike', zip_response.provincie),
-								], limit = 1
-							)
-						
-						partner.street = f"{zip_response.straat} {zip_response.huisnummer}" or ''
-						partner.city = zip_response.woonplaats or ''
-						partner.country_id = self.env.ref('base.nl').id  # or use 165 if you must
-						partner.state_id = state or False
-						partner.ep_lookup_status = 1
-						
-						_logger.info(f"[Zip] Autofill completed for {partner.name}.")
-						return None
-					return None
-				
-				except Exception as e:
-					_logger.warning(f"[Zip] Lookup failed for {partner.name}: {e}")
-					
-					partner.street = ''
-					partner.city = ''
-					partner.state_id = False
-					
-					warnings.append(
-						f"ZIP -- Could not find address for zip '{partner.zip}' "
-						f"and number '{partner.full_house_number}'."
-						)
-			
-			return None
-		return None
-	
-	
-	def _bag_auto_fill_address_sync(self, warnings):
-		"""Synchronous BAG address autofill."""
-		for partner in self:
-			if not partner.house_number:
-				self._full_house_number_format(warnings)
-			
-			if partner.zip and partner.house_number:
-				bag_client = self.env['bag.api.client']
-				try:
-					bag_response = bag_client.fetch_address(  # sync method required
-						postcode = partner.zip.replace(' ', ''),
-						huisnummer = partner.house_number,
-						huisletter = partner.house_letter,
-						huisnummertoevoeging = partner.house_number_addition,
-						)
-					if bag_response and bag_response.embedded and bag_response.embedded.adressen:
-						
-						if len(bag_response.embedded.adressen) > 1:
-							_logger.warning(f"[BAG] Multiple addresses found for {partner.name}.")
-							warnings.append(
-								f"BAG -- Found a more BAG-IDs for zip: '{partner.zip}' "
-								f"and number in the BAG register'{partner.full_house_number}'."
-								)
-							return
-						
-						adres = bag_response.embedded.adressen[0]
-						# Adres of the bag into the buffer
-						BufferManager.set(adres)
-						
-						partner.addressable_object = adres.adresseerbaarObjectIdentificatie
-						partner.ep_lookup_status = 2
-						
-						_logger.info(f"[BAG] Autofill completed for {partner.name}.")
-				
-				except Exception as e:
-					_logger.warning(f"[BAG] Lookup failed for {partner.name}: {e}")
-					
-					partner.street = ''
-					partner.city = ''
-					partner.state_id = False
-					
-					warnings.append(
-						f"BAG -- Could not find address for zip: '{partner.zip}' "
-						f"and number in the BAG register'{partner.full_house_number}'."
-						)
-	
-	
-	def _ep_auto_fill_address_sync(self, warnings):
-		for partner in self:
-			if not partner.exists():
-				_logger.warning(f"Partner {partner} does not exist in DB.")
-				continue
-			
-			if partner.addressable_object:
-				try:
-					parsed = self.env['ep.api.client'].fetch_with_address_object(
-						adresseerbaar_object_id = partner.addressable_object,
-						)
-					# parsed is a Pydantic structure
-					BufferManager.set(parsed)
-					partner.ep_lookup_status = 3
-				
-				except Exception as e:
-					_logger.exception(f"EP autofill failed {partner.name}: {e}")
-					
-					warnings.append(
-						f"Ep-Online -- Could not find a Energy label for zip: '{partner.zip}' "
-						f"and number in the EP-Online register'{partner.full_house_number}'."
-						f"using the Usable Area and Construction Year from BAG register"
-						)

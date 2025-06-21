@@ -1,8 +1,8 @@
 import logging
 import httpx
-from odoo import models
-from odoo.addons.bag_ep_api.services.base_models.zip_basemodel import \
-	ZipData  # Ensure this returns a data class or parsed dict
+
+from odoo.addons.bag_ep_api.services.api_calls.base_resolver import BaseEpResolver
+from odoo.addons.bag_ep_api.services.base_models.zip_basemodel import ZipData
 
 
 _logger = logging.getLogger(__name__)
@@ -12,9 +12,42 @@ class ZipApiClientError(Exception):
 	"""Custom error for ZIP_API_client."""
 
 
-class ZipApiClient(models.AbstractModel):
-	_name = "zip.api.client"
-	_description = "ZIP API Client"
+class ZipApiResolver(BaseEpResolver):
+	
+	def _init_client(self):
+		return ZipApiClient(self.env)
+	
+	
+	def _call_api(self, partner):
+		return self.client.fetch_address(
+			zipcode = partner.zip,
+			full_house_number = partner.full_house_number,
+			)
+	
+	
+	def _source_prefix(self):
+		return "ZIP"
+	
+	
+	def apply_from_data(self, zip_data):
+		if not zip_data:
+			return
+		
+		state = self.env['res.country.state'].search(
+			[('name', 'ilike', zip_data.provincie)],
+			limit = 1
+			)
+		
+		self.partner.street = f"{zip_data.straat} {zip_data.huisnummer}" or ''
+		self.partner.city = zip_data.woonplaats or ''
+		self.partner.country_id = self.env.ref('base.nl').id
+		self.partner.state_id = state or False
+		self.partner.ep_lookup_status = 1
+
+
+class ZipApiClient:
+	def __init__(self, env = None):
+		self.env = env
 	
 	
 	@staticmethod
@@ -22,18 +55,12 @@ class ZipApiClient(models.AbstractModel):
 		return "https://openpostcode.nl/api/address"
 	
 	
-	# api_url = self.env['ir.config_parameter'].sudo().with_context(company_id = self.env.company.id).get_param(
-	# 	'bag_ep_api.zip_api_url', default = ''
-	# 	).strip() or "https://openpostcode.nl/api/address"
-	# return api_url
-	
 	def fetch_address(self, zipcode, full_house_number):
 		url = f"{self._get_url()}"
 		params = {
 			"postcode": zipcode.replace(' ', '').upper(),
 			"huisnummer": full_house_number,
 			}
-		
 		try:
 			with httpx.Client(timeout = 10.0) as client:
 				_logger.info(f"[BAG API] Fetching address with params: {params}")
@@ -43,13 +70,13 @@ class ZipApiClient(models.AbstractModel):
 				data = response.json()
 				_logger.debug(f"[ZIP API] Response data: {data}")
 				parsed = ZipData.model_validate(data)
-				
 				_logger.debug(f"[ZIP API] Parsed AddressResponse attributes: {vars(parsed)}")
+				
 				return parsed
 		
 		except httpx.RequestError as e:
 			_logger.error(f"[ZIP API] Network error: {e}")
-			raise ZipApiClientError(f"Network error while contacting BAG API: {str(e)}") from e
+			raise ZipApiClientError(f"Network error while contacting ZIP API: {str(e)}") from e
 		
 		except httpx.HTTPStatusError as e:
 			_logger.error(f"[ZIP API] HTTP error: {e.response.status_code} - {e.response.text}")

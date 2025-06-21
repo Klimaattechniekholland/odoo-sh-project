@@ -32,12 +32,12 @@ class Adres(BaseModel):
 	openbareRuimteNaam: Optional[str]
 	korteNaam: Optional[str]
 	
-	huisnummer: int
-	# house_number: int = Field(default = 0, alias = 'huisnummer')
+	# huisnummer: int
+	house_number: int = Field(default = 0, alias = 'huisnummer')
 	# huisletter:Optional[str]
-	# house_letter: str = Field(default = "", alias = 'huisletter')
+	house_letter: str = Field(default = "", alias = 'huisletter')
 	# huisnummertoevoeging:Optional[int]
-	# house_number_addition: int = Field(default = 0, alias = 'huisnummertoevoeging')
+	house_number_addition: int = Field(default = 0, alias = 'huisnummertoevoeging')
 	# postcode: str
 	postal_code: str = Field(default = "", alias = 'postcode')
 	
@@ -61,6 +61,8 @@ class Adres(BaseModel):
 	
 	pandStatussen: Optional[List[str]]
 	_links: Links
+
+
 
 
 class Embedded(BaseModel):

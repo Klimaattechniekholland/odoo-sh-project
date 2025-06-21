@@ -84,9 +84,9 @@ class ResPartner(models.Model):
 		partners = super().create(vals_list)
 		for partner in partners:
 			
-			# todo: cache call
+			fetched_data, warnings = ResolverManager(self).resolve_all(warnings)
 			parsed = None
-
+			
 			if parsed and not partner.parent_id:
 				filtered_vals = filter_model_fields(self.env, 'ep.data', parsed.model_dump())
 				ep_data_model = self.env['ep.data']
@@ -104,8 +104,8 @@ class ResPartner(models.Model):
 		result = super().write(vals)
 		
 		for partner in self:
-			# todo: cache call
-			parsed = None
+			
+			parsed, warnings = ResolverManager(self).resolve_all(warnings)
 			
 			if parsed and not partner.parent_id:
 				filtered_vals = filter_model_fields(self.env, 'ep.data', parsed.model_dump())
@@ -327,8 +327,8 @@ class ResPartner(models.Model):
 	def action_ep_api_lookup(self):
 		"""Manual BAG fetch from the UI button."""
 		for partner in self:
-			# todo: cache call
-			parsed = None
+			parsed, warnings = ResolverManager(self).resolve_all(warnings)
+			
 			if parsed:
 				filtered_vals = filter_model_fields(self.env, 'ep.data', parsed.model_dump())
 				ep_data_model = self.env['ep.data']

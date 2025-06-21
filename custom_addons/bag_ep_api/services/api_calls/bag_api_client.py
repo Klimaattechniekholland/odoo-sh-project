@@ -28,14 +28,15 @@ class BagApiResolver(BaseEpResolver):
 
 	def _source_prefix(self):
 		return "BAG"
-
-	def apply_from_data(self, bag_data):
+	
+	
+	def apply_from_data(self, bag_data, cache = True):
 		if not bag_data:
 			return None
 		
 		embedded = getattr(bag_data, "embedded", None)
 		adressen = getattr(embedded, "adressen", None) if embedded else None
-
+		
 		if not embedded or not adressen:
 			_logger.warning(f"[BAG] No address found for {self.partner.name}.")
 			self._warnings.append(
@@ -53,12 +54,18 @@ class BagApiResolver(BaseEpResolver):
 			return None
 		
 		adres = adressen[0]
+		
+		# Apply to partner
 		self.partner.addressable_object = adres.adresseerbaarObjectIdentificatie
 		self.partner.ep_lookup_status = 2
+		
+		# Optionally refresh cache
+		if cache:
+			self._get_cache()[self._cache_key()] = bag_data
+		
 		_logger.info(f"[BAG] Autofill completed for {self.partner.name}.")
-		
 		return adres
-		
+
 
 class BagApiClient:
 	

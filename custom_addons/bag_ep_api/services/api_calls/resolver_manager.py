@@ -46,8 +46,10 @@ class ResolverManager:
 	def _run_bag(self):
 		if self._warnings:
 			return
+		
 		# we fetch all adressen if there are more than one because of the number, letter, addition
 		self._bag_data, self._warnings = BagApiResolver(self.partner).get(self._warnings)
+		
 		if self._bag_data and not self._warnings:
 			# get only one, first address
 			self._bag_data = BagApiResolver(self.partner).apply_from_data(self._bag_data)
@@ -59,16 +61,8 @@ class ResolverManager:
 			return
 		
 		self._fetched_data, self._warnings = EpApiResolver(self.partner).get(self._warnings)
-		if not self._fetched_data:
-			self._fetched_data = self._bag_data
+		if self._warnings:
 			return
+			
+		self._fetched_data = EpApiResolver(self.partner).apply_from_data(self._fetched_data, self._bag_data)
 		
-		# Fallback from BAG data
-		if hasattr(self, '_bag_data'):
-			if self._fetched_data.usable_area == 0:
-				self._fetched_data.usable_area = self._bag_data.usable_area or 0
-			if self._fetched_data.construction_year == 0:
-				self._fetched_data.construction_year = self._bag_data.construction_year or 0
-		
-		self.partner.ep_lookup_status = 3
-		_logger.info(f"[EP] Autofill completed for {self.partner.name}.")

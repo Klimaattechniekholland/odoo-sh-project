@@ -28,6 +28,26 @@ class EpApiResolver(BaseEpResolver):
 	
 	def _source_prefix(self):
 		return "EP"
+	
+	
+	def apply_from_data(self, ep_data, bag_data, cache = True):
+		
+		if ep_data and bag_data:
+			if ep_data.usable_area == 0:
+				ep_data.usable_area = bag_data.usable_area or 0
+			if ep_data.construction_year == 0:
+				ep_data.construction_year = bag_data.construction_year or 0
+		
+		if not ep_data:
+			ep_data = bag_data
+			
+		if cache:
+			self._get_cache()[self._cache_key()] = ep_data
+		
+		_logger.info(f"[EP] Autofill completed for {self.partner.name}.")
+		self.partner.ep_lookup_status = 3
+		
+		return ep_data
 
 
 class EpApiClient:

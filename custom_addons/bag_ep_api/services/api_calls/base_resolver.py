@@ -2,12 +2,14 @@
 
 import logging
 
+from odoo.addons.bag_ep_api.utils.cache import create_lru_cache
+
 
 _logger = logging.getLogger(__name__)
 
 
 class BaseEpResolver:
-	_cache = {}
+	_caches_by_company = {}
 	
 	
 	def __init__(self, partner, env = None):
@@ -19,19 +21,28 @@ class BaseEpResolver:
 	def get(self, warnings = None, force_refresh = False):
 		warnings = warnings or []
 		key = self._cache_key()
+		cache = self._get_cache()
 		
-		if not force_refresh and key in self._cache:
-			return self._cache[key], warnings
+		if not force_refresh and key in cache:
+
+			return cache[key], warnings
 		
 		result = self._fetch(warnings)
 		if result is not None:
-			self._cache[key] = result
+			cache[key] = result
 		
 		return result, warnings
 	
 	
 	def clear_cache(self):
-		self._cache.pop(self._cache_key(), None)
+		self._get_cache().pop(self._cache_key(), None)
+	
+	
+	def _get_cache(self):
+		company_id = self.env.company.id
+		if company_id not in self._caches_by_company:
+			self._caches_by_company[company_id] = create_lru_cache()
+		return self._caches_by_company[company_id]
 	
 	
 	def _cache_key(self):

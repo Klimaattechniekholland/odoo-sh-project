@@ -64,20 +64,6 @@ class ResConfigSettings(models.TransientModel):
 		company_dependent = True
 		)
 	
-	ep_api_level_warnings = fields.Selection(
-    [
-        ('none', 'None'),
-        ('medium', 'Medium'),
-        ('high', 'High'),
-        ('critical', 'Critical'),
-    ],
-		string = _("EP API Level Warnings "),
-		config_parameter = "bag_ep_api.ep_api_level_warnings",
-		default = 'medium',
-		company_dependent = True,
-	required = True
-	
-	)
 	
 	@api.model
 	def get_values(self):

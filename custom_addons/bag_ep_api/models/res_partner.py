@@ -10,8 +10,6 @@ from odoo.exceptions import UserError, ValidationError
 
 
 _logger = logging.getLogger(__name__)
-wm = WarningManager()
-
 
 class ResPartner(models.Model):
 	_inherit = 'res.partner'
@@ -63,14 +61,6 @@ class ResPartner(models.Model):
 	# 2 | BAG found
 	# 3 | EP-Online found
 	
-	lookup_status = fields.Selection(
-		selection = [
-			('idle', 'Idle'),
-			('success', 'Success'),
-			('error', 'Error')
-			],
-		default = 'idle'
-		)
 	
 	ep_data_ids = fields.One2many(
 		'ep.data',  # target model
@@ -151,7 +141,7 @@ class ResPartner(models.Model):
 				record.city = ''
 				record.state_id = False
 				
-				wm.add(
+				warnings.add(
 					"warning", _("ZIP -- Invalid ZIP Code: '%(zip)s'. Please use format '1234 AB' or '1234AB'.") % {
 						'zip': record.zip
 						}
@@ -277,10 +267,7 @@ class ResPartner(models.Model):
 			'bag_ep_api.ep_api_recreate', default = ''
 			).strip() or False
 		return api_recreate
-	
-	
-	wm = WarningManager()
-	
+		
 	
 	def _get_level_warnings(self):
 		api_level_warnings = self.env['ir.config_parameter'].sudo().with_context(

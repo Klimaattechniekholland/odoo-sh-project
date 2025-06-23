@@ -77,13 +77,6 @@
                             <field name="ep_api_show_warnings"/>
                         </setting>
 
-                        <setting string="EP API Level Warnings"
-                                 help="Show warnings"
-                                 id="ep_api_level_warnings_setting">
-                            <field name="ep_api_level_warnings"/>
-                        </setting>
-
-
                     </block>
                 </app>
             </xpath>

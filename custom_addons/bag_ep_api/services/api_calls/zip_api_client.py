@@ -29,9 +29,29 @@ class ZipApiResolver(BaseEpResolver):
 		return "ZIP"
 	
 	
-	def apply_from_data(self, zip_data):
+	def values_from_data(self, zip_data):
 		if not zip_data:
-			return
+			return None
+		
+		parsed_values = {}
+		
+		state = self.env['res.country.state'].search(
+			[('name', 'ilike', zip_data.provincie)],
+			limit = 1
+			)
+		
+		parsed_values['street'] = f"{zip_data.straat} {zip_data.huisnummer}" or ''
+		parsed_values['city'] = zip_data.woonplaats or ''
+		parsed_values['state_id'] = state or False
+		parsed_values['country_id'] = self.env.ref('base.nl').id
+		parsed_values['ep_lookup_status'] = 1
+		
+		return parsed_values
+	
+	
+	def fields_from_data(self, zip_data):
+		if not zip_data:
+			return None
 		
 		state = self.env['res.country.state'].search(
 			[('name', 'ilike', zip_data.provincie)],
@@ -40,9 +60,11 @@ class ZipApiResolver(BaseEpResolver):
 		
 		self.partner.street = f"{zip_data.straat} {zip_data.huisnummer}" or ''
 		self.partner.city = zip_data.woonplaats or ''
-		self.partner.country_id = self.env.ref('base.nl').id
 		self.partner.state_id = state or False
+		self.partner.country_id = self.env.ref('base.nl').id
 		self.partner.ep_lookup_status = 1
+		
+		return None
 
 
 class ZipApiClient:

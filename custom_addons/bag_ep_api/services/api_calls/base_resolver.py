@@ -38,6 +38,19 @@ class BaseEpResolver:
 		self._get_cache().pop(self._cache_key(), None)
 	
 	
+	def clear_partner_cache(self):
+		prefix = self._source_prefix()
+		pid = self.partner.id
+		
+		keys_to_remove = [
+			k for k in self._get_cache()
+			if k[0] == prefix and k[1] == pid
+			]
+		
+		for k in keys_to_remove:
+			self._get_cache().pop(k, None)
+
+	
 	def _get_cache(self):
 		company_id = self.env.company.id
 		if company_id not in self._caches_by_company:

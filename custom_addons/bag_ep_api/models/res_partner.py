@@ -4,12 +4,12 @@ import re
 from odoo.addons.bag_ep_api.services.api_calls.resolver_manager import ResolverManager
 from odoo.addons.bag_ep_api.services.api_calls.zip_api_client import ZipApiResolver
 from odoo.addons.bag_ep_api.utils.filter_model_fields import filter_model_fields
-from odoo.addons.bag_ep_api.utils.warning_manager import WarningManager
 from ..utils.format_dutch_zip import format_dutch_zip
 from odoo.exceptions import UserError, ValidationError
 
 
 _logger = logging.getLogger(__name__)
+
 
 class ResPartner(models.Model):
 	_inherit = 'res.partner'
@@ -61,7 +61,6 @@ class ResPartner(models.Model):
 	# 2 | BAG found
 	# 3 | EP-Online found
 	
-	
 	ep_data_ids = fields.One2many(
 		'ep.data',  # target model
 		'partner_id',  # inverse field in ep.data
@@ -72,10 +71,15 @@ class ResPartner(models.Model):
 	@api.model_create_multi
 	def create(self, vals_list):
 		partners = super().create(vals_list)
+		
+		
+		
+		warnings = []
+		
 		for partner in partners:
 			
-			fetched_data, warnings = ResolverManager(self).resolve_all(warnings)
-			parsed = None
+			fetched_data, warnings = ResolverManager(self).resolve_bag_ep(warnings)
+			parsed = fetched_data
 			
 			if parsed and not partner.parent_id:
 				filtered_vals = filter_model_fields(self.env, 'ep.data', parsed.model_dump())
@@ -91,28 +95,47 @@ class ResPartner(models.Model):
 	
 	
 	def write(self, vals):
-		result = super().write(vals)
 		
-		for partner in self:
-			
-			parsed, warnings = ResolverManager(self).resolve_all(warnings)
-			
-			if parsed and not partner.parent_id:
-				filtered_vals = filter_model_fields(self.env, 'ep.data', parsed.model_dump())
-				ep_data_model = self.env['ep.data']
-				existing = ep_data_model.search([('partner_id', '=', partner.id)], limit = 1)
-				
-				if existing:
-					existing.write(filtered_vals)
-				else:
-					ep_data_model.create(
-						{
-							'partner_id': partner.id,
-							**filtered_vals
-							}
-						)
+		super().write(vals)
 		
-		return result
+		# if self.env.context.get('skip_resolve_zip'):
+		# 	return super().write(vals)
+		#
+		# warnings = []
+		# parsed_data, warnings = ResolverManager(self).resolve_zip(warnings)
+		# if parsed_data:
+		# 	for key, value in parsed_data.items():
+		# 		if key not in vals and value:
+		# 			vals[key] = value
+		#
+		# 	self = self.with_context(skip_resolve_zip = True)
+		# 	super().write(vals)
+		
+		# warnings = []
+		# for partner in self:
+		#
+		# 	parsed, warnings = ResolverManager(self).resolve_bag_ep(warnings)
+		#
+		# 	if parsed and not partner.parent_id:
+		# 		filtered_values = filter_model_fields(self.env, 'ep.data', parsed.model_dump())
+		# 		ep_data_model = self.env['ep.data']
+		# 		existing = ep_data_model.search([('partner_id', '=', partner.id)], limit = 1)
+		#
+		# 		if existing:
+		# 			existing.write(filtered_values)
+		# 		else:
+		# 			ep_data_model.create(
+		# 				{
+		# 					'partner_id': partner.id,
+		# 					**filtered_values
+		# 					}
+		# 				)
+		# 	if warnings:
+		# 		raise UserError(warnings)
+		#
+		# 	return partner
+		#
+		# return None
 	
 	
 	@api.onchange('country_id')
@@ -130,7 +153,6 @@ class ResPartner(models.Model):
 		warnings = []
 		for record in self:
 			record.ep_lookup_status = 0
-			record.lookup_status = 'idle'
 			if not record.zip:
 				continue
 			formatted = format_dutch_zip(record.zip)
@@ -148,7 +170,7 @@ class ResPartner(models.Model):
 					)
 		
 		if not warnings:
-			fetched_data, warnings = ResolverManager(self).resolve_all(warnings)
+			fetched_data, warnings = ResolverManager(self).resolve_all(warnings, True)
 			
 			return self._handle_onchange_result(
 				warnings = warnings,
@@ -185,16 +207,16 @@ class ResPartner(models.Model):
 		warnings = []
 		for partner in self:
 			partner.ep_lookup_status = 0
-			partner._full_house_number_format(warnings)
+			# partner.parse_full_house_number(warnings)
 			
 			if not warnings:
 				if partner.parent_id:
 					zip_data, warnings = ZipApiResolver(self).get(warnings)
 					
 					if not warnings:
-						ZipApiResolver(self).apply_from_data(zip_data)
+						ZipApiResolver(self).values_from_data(zip_data)
 				else:
-					fetched_data, warnings = ResolverManager(self).resolve_all(warnings)
+					fetched_data, warnings = ResolverManager(self).resolve_all(warnings, True)
 			
 			return self._handle_onchange_result(
 				warnings = warnings,
@@ -250,7 +272,6 @@ class ResPartner(models.Model):
 				# create a new ep.data record linked to the partner - self
 				self.ep_data_ids = [(0, 0, filtered_vals)]
 				result.setdefault('value', {})['ep_data_ids'] = self.ep_data_ids
-		# BufferManager.clear()
 		
 		# Show a warning message if needed
 		if warnings:
@@ -267,7 +288,7 @@ class ResPartner(models.Model):
 			'bag_ep_api.ep_api_recreate', default = ''
 			).strip() or False
 		return api_recreate
-		
+	
 	
 	def _get_level_warnings(self):
 		api_level_warnings = self.env['ir.config_parameter'].sudo().with_context(
@@ -276,30 +297,6 @@ class ResPartner(models.Model):
 			'bag_ep_api.ep_api_level_warnings', default = 'none'
 			).strip() or False
 		return api_level_warnings
-	
-	
-	def _full_house_number_format(self, warnings):
-		for record in self:
-			record.house_number = False
-			record.house_letter = False
-			record.house_number_addition = False
-			
-			if not record.full_house_number:
-				continue
-			
-			try:
-				num, let, ext = self.parse_full_house_number(record.full_house_number)
-				record.house_number = num
-				record.house_letter = let
-				record.house_number_addition = ext
-			
-			except UserError as e:
-				
-				warnings.append(
-					f"ZIP -- Invalid House Number Format '{str(e)}' "
-					)
-		
-		return None
 	
 	
 	def action_reset_to_defaults(self):
@@ -314,7 +311,7 @@ class ResPartner(models.Model):
 	def action_ep_api_lookup(self):
 		"""Manual BAG fetch from the UI button."""
 		for partner in self:
-			parsed, warnings = ResolverManager(self).resolve_all(warnings)
+			parsed, warnings = ResolverManager(self).resolve_all(warnings, True)
 			
 			if parsed:
 				filtered_vals = filter_model_fields(self.env, 'ep.data', parsed.model_dump())
@@ -323,17 +320,3 @@ class ResPartner(models.Model):
 				
 				if existing:
 					existing.write(filtered_vals)
-	
-	
-	@staticmethod
-	def parse_full_house_number(full_house_number):
-		pattern = re.compile(r"^(\d+)([A-Za-z]?)(?:-(\d+))?$")
-		match = pattern.match(full_house_number.strip())
-		if not match:
-			raise UserError(_("Invalid format. Use e.g. '70', '70A', '70-1', or '70A-1'."))
-		
-		return (
-			int(match.group(1)),
-			match.group(2) if match.group(2) else None,
-			int(match.group(3)) if match.group(3) else None
-			)

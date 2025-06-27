@@ -3,6 +3,7 @@ import httpx
 from odoo.addons.bag_ep_api.services.api_calls.base_resolver import BaseEpResolver
 from odoo.addons.bag_ep_api.services.base_models.bag_basemodel import \
 	AddressResponse  # Ensure this returns a data class or parsed dict
+from odoo.addons.bag_ep_api.utils.parse_full_house_number import parse_full_house_number
 
 
 _logger = logging.getLogger(__name__)
@@ -18,11 +19,14 @@ class BagApiResolver(BaseEpResolver):
 	
 	
 	def _call_api(self, partner):
+		
+		house_number, house_letter, house_number_addition = parse_full_house_number(partner.full_house_number)
+		
 		return self.client.fetch_address(
 			postcode = partner.zip.replace(' ', ''),
-			huisnummer = partner.house_number,
-			huisletter = partner.house_letter,
-			huisnummertoevoeging = partner.house_number_addition,
+			huisnummer = house_number,
+			huisletter = house_letter,
+			huisnummertoevoeging = house_number_addition,
 			)
 	
 
@@ -30,8 +34,8 @@ class BagApiResolver(BaseEpResolver):
 		return "BAG"
 	
 	
-	def apply_from_data(self, bag_data, cache = True):
-		if not bag_data:
+	def apply_from_data(self, bag_data, warnings = None, cache = True):
+		if not bag_data or warnings:
 			return None
 		
 		embedded = getattr(bag_data, "embedded", None)
@@ -39,19 +43,19 @@ class BagApiResolver(BaseEpResolver):
 		
 		if not embedded or not adressen:
 			_logger.warning(f"[BAG] No address found for {self.partner.name}.")
-			self._warnings.append(
+			warnings.append(
 				f"BAG — No addresses found for zip '{self.partner.zip}' "
 				f"and number '{self.partner.full_house_number}'."
 				)
-			return None
+			return None, warnings
 		
 		if len(adressen) > 1:
 			_logger.warning(f"[BAG] Multiple addresses found for {self.partner.name}.")
-			self._warnings.append(
+			warnings.append(
 				f"BAG — Multiple addresses found for zip '{self.partner.zip}' "
 				f"and number '{self.partner.full_house_number}'."
 				)
-			return None
+			return None, warnings
 		
 		adres = adressen[0]
 		
@@ -64,7 +68,7 @@ class BagApiResolver(BaseEpResolver):
 			self._get_cache()[self._cache_key()] = bag_data
 		
 		_logger.info(f"[BAG] Autofill completed for {self.partner.name}.")
-		return adres
+		return adres, warnings
 
 
 class BagApiClient:

@@ -1,6 +1,3 @@
-# def filter_model_fields(env, model_name, values: dict):
-#     valid = env[model_name].fields_get().keys()
-#     return {k: v for k, v in values.items() if k in valid}
 
 
 def filter_model_fields(env, model_name, raw_values: dict):

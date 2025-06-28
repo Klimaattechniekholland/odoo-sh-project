@@ -1,13 +1,11 @@
 import logging
+
 import httpx
-from odoo import models
+
 from odoo.addons.bag_ep_api.services.api_calls.base_resolver import BaseEpResolver
 from odoo.addons.bag_ep_api.services.base_models.ep_basemodel import EpDataSchema
 from odoo.addons.bag_ep_api.utils.buffer_manager import BufferManager
 
-
-# from odoo.addons.bag_ep_api.services.base_models.ep_basemodel import \
-# 	EpData  # Ensure this returns a data class or parsed dict
 
 _logger = logging.getLogger(__name__)
 
@@ -41,15 +39,14 @@ class EpApiResolver(BaseEpResolver):
 		
 		if not ep_data:
 			ep_data = bag_data
-			
+		
 		if cache:
 			self._get_cache()[self._cache_key()] = ep_data
 		
 		_logger.info(f"[EP] Autofill completed for {self.partner.name}.")
 		self.partner.ep_lookup_status = 3
-		BufferManager.set(self.env.user.id,'ep_lookup_status',3 )
-
-
+		BufferManager.set(self.env.user.id, 'ep_lookup_status', 3)
+		
 		return ep_data
 
 
@@ -73,11 +70,6 @@ class EpApiClient:
 	def _get_url():
 		return "https://public.ep-online.nl/api/v5/PandEnergielabel"
 	
-	
-	# api_url = self.env['ir.config_parameter'].sudo().with_context(company_id = self.env.company.id).get_param(
-	# 	'bag_ep_api.ep_api_url', default = ''
-	# 	).strip() or  "https://public.ep-online.nl/api/v5/PandEnergielabel"
-	# return api_url
 	
 	def fetch_with_address_object(self, adresseerbaar_object_id):
 		url = f"{self._get_url()}/AdresseerbaarObject/{adresseerbaar_object_id}"

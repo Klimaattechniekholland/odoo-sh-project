@@ -1,5 +1,7 @@
 import logging
+
 import httpx
+
 from odoo.addons.bag_ep_api.services.api_calls.base_resolver import BaseEpResolver
 from odoo.addons.bag_ep_api.services.base_models.bag_basemodel import \
 	AddressResponse  # Ensure this returns a data class or parsed dict
@@ -30,7 +32,7 @@ class BagApiResolver(BaseEpResolver):
 			huisnummertoevoeging = house_number_addition,
 			)
 	
-
+	
 	def _source_prefix(self):
 		return "BAG"
 	
@@ -63,8 +65,7 @@ class BagApiResolver(BaseEpResolver):
 		# Apply to partner
 		self.partner.addressable_object = adres.adresseerbaarObjectIdentificatie
 		self.partner.ep_lookup_status = 2
-		BufferManager.set(self.env.user.id, 'ep_lookup_status',2 )
-
+		BufferManager.set(self.env.user.id, 'ep_lookup_status', 2)
 		
 		# Optionally refresh cache
 		if cache:
@@ -75,12 +76,13 @@ class BagApiResolver(BaseEpResolver):
 
 
 class BagApiClient:
-	
 	#  next option to set to more adressen, need to add a new view for selection
 	MODEL = "adressenuitgebreid"
-
+	
+	
 	def __init__(self, env = None):
 		self.env = env
+	
 	
 	def _get_headers(self):
 		"""Fetch API_key and set required headers."""
@@ -98,13 +100,6 @@ class BagApiClient:
 	@staticmethod
 	def _get_url():
 		return "https://api.bag.kadaster.nl/lvbag/individuelebevragingen/v2/"
-	
-	
-	# 	api_url = self.env['ir.config_parameter'].sudo().with_context(company_id = self.env.company.id).get_param(
-	# 		'bag_ep_api.bag_api_url', default = ''
-	# 		).strip() or "https://api.bag.kadaster.nl/lvbag/individuelebevragingen/v2/"
-	# 		# ensure that the last '/' is set
-	# 	return api_url.rstrip('/') + '/'
 	
 	
 	def _get_exact_match(self):

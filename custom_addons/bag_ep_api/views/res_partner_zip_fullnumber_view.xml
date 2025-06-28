@@ -19,10 +19,6 @@
                                    placeholder="Number"
                                    class="o_address_city"
                                    readonly="type == 'contact' and parent_id"/>
-                            <field name="ep_lookup_status"
-                                   placeholder="status"
-                                   class="o_address_city"
-                                   readonly="true"/>
                         </div>
                     </group>
 

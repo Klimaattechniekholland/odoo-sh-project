@@ -24,7 +24,6 @@ class BaseEpResolver:
 		cache = self._get_cache()
 		
 		if not force_refresh and key in cache:
-
 			return cache[key], warnings
 		
 		result = self._fetch(warnings)
@@ -49,7 +48,7 @@ class BaseEpResolver:
 		
 		for k in keys_to_remove:
 			self._get_cache().pop(k, None)
-
+	
 	
 	def _get_cache(self):
 		company_id = self.env.company.id
@@ -83,7 +82,7 @@ class BaseEpResolver:
 		except Exception as e:
 			_logger.warning(f"[{self._source_prefix()}] API call failed for {partner.name}: {e}")
 			warnings.append(
-				f"{self._source_prefix()} — fout bij ophalen data voor postcode '{partner.zip}' "
+				f"{self._source_prefix()} — Fout bij ophalen data voor postcode '{partner.zip}' "
 				f"en huisnummer '{partner.full_house_number}'."
 				)
 			return None

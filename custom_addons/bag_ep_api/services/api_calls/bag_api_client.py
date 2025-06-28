@@ -3,6 +3,7 @@ import httpx
 from odoo.addons.bag_ep_api.services.api_calls.base_resolver import BaseEpResolver
 from odoo.addons.bag_ep_api.services.base_models.bag_basemodel import \
 	AddressResponse  # Ensure this returns a data class or parsed dict
+from odoo.addons.bag_ep_api.utils.buffer_manager import BufferManager
 from odoo.addons.bag_ep_api.utils.parse_full_house_number import parse_full_house_number
 
 
@@ -62,6 +63,8 @@ class BagApiResolver(BaseEpResolver):
 		# Apply to partner
 		self.partner.addressable_object = adres.adresseerbaarObjectIdentificatie
 		self.partner.ep_lookup_status = 2
+		BufferManager.set(self.env.user.id, 'ep_lookup_status',2 )
+
 		
 		# Optionally refresh cache
 		if cache:

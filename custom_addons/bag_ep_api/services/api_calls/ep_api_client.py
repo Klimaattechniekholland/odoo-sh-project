@@ -3,6 +3,7 @@ import httpx
 from odoo import models
 from odoo.addons.bag_ep_api.services.api_calls.base_resolver import BaseEpResolver
 from odoo.addons.bag_ep_api.services.base_models.ep_basemodel import EpDataSchema
+from odoo.addons.bag_ep_api.utils.buffer_manager import BufferManager
 
 
 # from odoo.addons.bag_ep_api.services.base_models.ep_basemodel import \
@@ -46,7 +47,9 @@ class EpApiResolver(BaseEpResolver):
 		
 		_logger.info(f"[EP] Autofill completed for {self.partner.name}.")
 		self.partner.ep_lookup_status = 3
-		
+		BufferManager.set(self.env.user.id,'ep_lookup_status',3 )
+
+
 		return ep_data
 
 

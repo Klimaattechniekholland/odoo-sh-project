@@ -3,6 +3,7 @@ import httpx
 
 from odoo.addons.bag_ep_api.services.api_calls.base_resolver import BaseEpResolver
 from odoo.addons.bag_ep_api.services.base_models.zip_basemodel import ZipData
+from odoo.addons.bag_ep_api.utils.buffer_manager import BufferManager
 
 
 _logger = logging.getLogger(__name__)
@@ -45,7 +46,7 @@ class ZipApiResolver(BaseEpResolver):
 		parsed_values['state_id'] = state or False
 		parsed_values['country_id'] = self.env.ref('base.nl').id
 		parsed_values['ep_lookup_status'] = 1
-		
+
 		return parsed_values
 	
 	
@@ -63,7 +64,7 @@ class ZipApiResolver(BaseEpResolver):
 		self.partner.state_id = state or False
 		self.partner.country_id = self.env.ref('base.nl').id
 		self.partner.ep_lookup_status = 1
-		
+		BufferManager.set(self.env.user.id,'ep_lookup_status',1 )
 		return None
 
 

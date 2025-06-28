@@ -3,7 +3,9 @@ import logging
 import re
 from odoo.addons.bag_ep_api.services.api_calls.resolver_manager import ResolverManager
 from odoo.addons.bag_ep_api.services.api_calls.zip_api_client import ZipApiResolver
+from odoo.addons.bag_ep_api.utils.buffer_manager import BufferManager
 from odoo.addons.bag_ep_api.utils.filter_model_fields import filter_model_fields
+from odoo.tools.view_validation import valid_view
 from ..utils.format_dutch_zip import format_dutch_zip
 from odoo.exceptions import UserError, ValidationError
 
@@ -55,7 +57,7 @@ class ResPartner(models.Model):
 	
 	addressable_object = fields.Char(string = "Addressable Object", readonly = True)
 	
-	ep_lookup_status = fields.Integer(string = "EP Lookup status", default = 0)
+	ep_lookup_status = fields.Integer(string = "EP Lookup status", readonly = True, default = 0)
 	# 0 | not found
 	# 1 | ZIP found
 	# 2 | BAG found
@@ -96,7 +98,19 @@ class ResPartner(models.Model):
 	
 	def write(self, vals):
 		
-		super().write(vals)
+		buffer = BufferManager.get(self.env.user.id)
+		for key in buffer:
+			if key not in vals:
+				vals[key] = buffer[key]
+		
+
+		res = super().write(vals)
+		for rec in self:
+			
+			if rec.ep_lookup_status == 0:
+				raise ValidationError(_('EP Lookup status cannot be 0'))
+		
+		return res
 		
 		# if self.env.context.get('skip_resolve_zip'):
 		# 	return super().write(vals)
@@ -153,6 +167,8 @@ class ResPartner(models.Model):
 		warnings = []
 		for record in self:
 			record.ep_lookup_status = 0
+			BufferManager.set(self.env.user.id,'ep_lookup_status', 0)
+			
 			if not record.zip:
 				continue
 			formatted = format_dutch_zip(record.zip)
@@ -205,8 +221,11 @@ class ResPartner(models.Model):
 	@api.onchange('full_house_number')
 	def _onchange_full_house_number(self):
 		warnings = []
+		fetched_data = None
 		for partner in self:
 			partner.ep_lookup_status = 0
+			BufferManager.set(self.env.user.id,'ep_lookup_status', 0)
+			
 			# partner.parse_full_house_number(warnings)
 			
 			if not warnings:

@@ -112,45 +112,6 @@ class ResPartner(models.Model):
 		
 		return res
 		
-		# if self.env.context.get('skip_resolve_zip'):
-		# 	return super().write(vals)
-		#
-		# warnings = []
-		# parsed_data, warnings = ResolverManager(self).resolve_zip(warnings)
-		# if parsed_data:
-		# 	for key, value in parsed_data.items():
-		# 		if key not in vals and value:
-		# 			vals[key] = value
-		#
-		# 	self = self.with_context(skip_resolve_zip = True)
-		# 	super().write(vals)
-		
-		# warnings = []
-		# for partner in self:
-		#
-		# 	parsed, warnings = ResolverManager(self).resolve_bag_ep(warnings)
-		#
-		# 	if parsed and not partner.parent_id:
-		# 		filtered_values = filter_model_fields(self.env, 'ep.data', parsed.model_dump())
-		# 		ep_data_model = self.env['ep.data']
-		# 		existing = ep_data_model.search([('partner_id', '=', partner.id)], limit = 1)
-		#
-		# 		if existing:
-		# 			existing.write(filtered_values)
-		# 		else:
-		# 			ep_data_model.create(
-		# 				{
-		# 					'partner_id': partner.id,
-		# 					**filtered_values
-		# 					}
-		# 				)
-		# 	if warnings:
-		# 		raise UserError(warnings)
-		#
-		# 	return partner
-		#
-		# return None
-	
 	
 	@api.onchange('country_id')
 	def _onchange_country_id_refresh_states(self):

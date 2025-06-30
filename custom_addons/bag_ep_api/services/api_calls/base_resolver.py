@@ -2,6 +2,7 @@
 
 import logging
 
+from odoo.addons.bag_ep_api.utils.buffer_manager import BufferManager
 from odoo.addons.bag_ep_api.utils.cache import create_lru_cache
 
 
@@ -12,10 +13,11 @@ class BaseEpResolver:
 	_caches_by_company = {}
 	
 	
-	def __init__(self, partner, env = None):
+	def __init__(self, partner, env = None, skip_client_init = False):
 		self.partner = partner
 		self.env = env or partner.env
-		self.client = self._init_client()
+		if not skip_client_init:
+			self.client = self._init_client()
 	
 	
 	def get(self, warnings = None, force_refresh = False):
@@ -38,16 +40,30 @@ class BaseEpResolver:
 	
 	
 	def clear_partner_cache(self):
-		prefix = self._source_prefix()
-		pid = self.partner.id
+		# prefix = self._source_prefix()
+		partner_id = self.partner.id
 		
 		keys_to_remove = [
-			k for k in self._get_cache()
-			if k[0] == prefix and k[1] == pid
+			cache_key for cache_key in self._get_cache()
+			if cache_key[1] == partner_id
 			]
 		
 		for k in keys_to_remove:
 			self._get_cache().pop(k, None)
+	
+	
+	@classmethod
+	def clear_partner_cache_static(cls, partner, env):
+		"""Clear all cache entries related to a specific partner."""
+		cache = cls._caches_by_company.get(env.company.id, {})
+		
+		keys_to_remove = [
+			cache_key for cache_key in cache
+			if cache_key[1] == partner.id
+			]
+		
+		for cache_key in keys_to_remove:
+			cache.pop(cache_key, None)
 	
 	
 	def _get_cache(self):
@@ -81,6 +97,7 @@ class BaseEpResolver:
 		
 		except Exception as e:
 			_logger.warning(f"[{self._source_prefix()}] API call failed for {partner.name}: {e}")
+			BufferManager.set(self.env.user.id, 'ep_lookup_status', 0)
 			warnings.append(
 				f"{self._source_prefix()} — Fout bij ophalen data voor postcode '{partner.zip}' "
 				f"en huisnummer '{partner.full_house_number}'."

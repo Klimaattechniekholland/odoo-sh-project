@@ -65,6 +65,7 @@ class BagApiResolver(BaseEpResolver):
 		# Apply to partner
 		self.partner.addressable_object = adres.adresseerbaarObjectIdentificatie
 		self.partner.ep_lookup_status = 2
+		
 		BufferManager.set(self.env.user.id, 'ep_lookup_status', 2)
 		
 		# Optionally refresh cache

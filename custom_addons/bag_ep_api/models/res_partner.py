@@ -1,13 +1,14 @@
-from odoo import models, fields, api, _
 import logging
 import re
+
+from odoo import _, api, fields, models
+from odoo.addons.bag_ep_api.services.api_calls.base_resolver import BaseEpResolver
 from odoo.addons.bag_ep_api.services.api_calls.resolver_manager import ResolverManager
 from odoo.addons.bag_ep_api.services.api_calls.zip_api_client import ZipApiResolver
 from odoo.addons.bag_ep_api.utils.buffer_manager import BufferManager
 from odoo.addons.bag_ep_api.utils.filter_model_fields import filter_model_fields
-from odoo.tools.view_validation import valid_view
+from odoo.exceptions import ValidationError
 from ..utils.format_dutch_zip import format_dutch_zip
-from odoo.exceptions import UserError, ValidationError
 
 
 _logger = logging.getLogger(__name__)
@@ -74,8 +75,6 @@ class ResPartner(models.Model):
 	def create(self, vals_list):
 		partners = super().create(vals_list)
 		
-		
-		
 		warnings = []
 		
 		for partner in partners:
@@ -103,7 +102,6 @@ class ResPartner(models.Model):
 			if key not in vals:
 				vals[key] = buffer[key]
 		
-
 		res = super().write(vals)
 		for rec in self:
 			
@@ -111,7 +109,7 @@ class ResPartner(models.Model):
 				raise ValidationError(_('EP Lookup status cannot be 0'))
 		
 		return res
-		
+	
 	
 	@api.onchange('country_id')
 	def _onchange_country_id_refresh_states(self):
@@ -127,34 +125,38 @@ class ResPartner(models.Model):
 	def _onchange_zip(self):
 		warnings = []
 		for record in self:
-			record.ep_lookup_status = 0
-			BufferManager.set(self.env.user.id,'ep_lookup_status', 0)
+			# record.ep_lookup_status = 0
+			# BufferManager.set(self.env.user.id,'ep_lookup_status', 0)
 			
-			if not record.zip:
-				continue
-			formatted = format_dutch_zip(record.zip)
-			if formatted:
-				record.zip = formatted
-			else:
-				record.street = ''
-				record.city = ''
-				record.state_id = False
+			if record.zip:
+				formatted = format_dutch_zip(record.zip)
 				
-				warnings.add(
-					"warning", _("ZIP -- Invalid ZIP Code: '%(zip)s'. Please use format '1234 AB' or '1234AB'.") % {
-						'zip': record.zip
-						}
-					)
+				if formatted:
+					record.zip = formatted
+				
+				else:
+					record.street = ''
+					record.city = ''
+					record.state_id = False
+					
+					warnings.add(
+						"warning", _("ZIP -- Invalid ZIP Code: '%(zip)s'. Please use format '1234 AB' or '1234AB'.") % {
+							'zip': record.zip
+							}
+						)
 		
-		if not warnings:
-			fetched_data, warnings = ResolverManager(self).resolve_all(warnings, True)
-			
-			return self._handle_onchange_result(
-				warnings = warnings,
-				model_name = 'ep.data',
-				data_model = fetched_data,
-				ep_lookup_status = self.ep_lookup_status,
-				)
+			if not warnings:
+				if record.parent_id:
+					fetched_data, warnings = ResolverManager(self).resolve_zip(warnings, True)
+				else:
+					fetched_data, warnings = ResolverManager(self).resolve_all(warnings, True)
+				
+				return self._handle_onchange_result(
+					warnings = warnings,
+					model_name = 'ep.data',
+					data_model = fetched_data,
+					ep_lookup_status = self.ep_lookup_status,
+					)
 		
 		return None
 	
@@ -184,17 +186,14 @@ class ResPartner(models.Model):
 		warnings = []
 		fetched_data = None
 		for partner in self:
-			partner.ep_lookup_status = 0
-			BufferManager.set(self.env.user.id,'ep_lookup_status', 0)
+			# partner.ep_lookup_status = 0
+			# BufferManager.set(self.env.user.id,'ep_lookup_status', 0)
 			
 			# partner.parse_full_house_number(warnings)
 			
 			if not warnings:
 				if partner.parent_id:
-					zip_data, warnings = ZipApiResolver(self).get(warnings)
-					
-					if not warnings:
-						ZipApiResolver(self).values_from_data(zip_data)
+					fetched_data, warnings = ResolverManager(self).resolve_zip(warnings, True)
 				else:
 					fetched_data, warnings = ResolverManager(self).resolve_all(warnings, True)
 			
@@ -232,6 +231,7 @@ class ResPartner(models.Model):
 							full_number = f"{number}{letter}"
 						
 						record.full_house_number = full_number
+						# this will trigger the onchange for full_house_number
 	
 	
 	def _handle_onchange_result(self, warnings = None, model_name = None, data_model = None, ep_lookup_status = None):
@@ -289,14 +289,23 @@ class ResPartner(models.Model):
 	
 	
 	def action_ep_api_lookup(self):
-		"""Manual BAG fetch from the UI button."""
+		"""Manual BAG fetch from the UI button, and clear Caches and BufferManager"""
+		
+		warnings = []
+		BufferManager.clear(self.env.user.id)
+		BaseEpResolver.clear_partner_cache_static(self, self.env)
+		
 		for partner in self:
 			parsed, warnings = ResolverManager(self).resolve_all(warnings, True)
 			
 			if parsed:
 				filtered_vals = filter_model_fields(self.env, 'ep.data', parsed.model_dump())
 				ep_data_model = self.env['ep.data']
+				
 				existing = ep_data_model.search([('partner_id', '=', partner.id)], limit = 1)
 				
 				if existing:
 					existing.write(filtered_vals)
+				else:
+					filtered_vals['partner_id'] = partner.id
+					ep_data_model.create(filtered_vals)

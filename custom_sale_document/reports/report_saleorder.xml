@@ -1,0 +1,77 @@
+<?xml version="1.0"?>
+<odoo>
+  <template id="sale.report_saleorder">
+    <t t-call="web.html_container">
+      <t t-foreach="docs" t-as="doc">
+        <t t-call="custom_sale_document.report_saleorder_document" t-lang="doc.partner_id.lang"/>
+      </t>
+    </t>
+  </template>
+
+  <template id="report_saleorder_document">
+    <t t-call="web.external_layout">
+      <div class="page">
+        <h2><t t-esc="doc.name"/> - Quotation</h2>
+        <p><strong>Client:</strong> <t t-esc="doc.partner_id.name"/></p>
+        <p><strong>Meldcode:</strong> <t t-esc="doc.meldcode or ''"/></p>
+        <p><strong>Date:</strong> <t t-esc="doc.date_order.strftime('%Y-%m-%d')"/></p>
+        <t t-if="doc.house_photo">
+          <img t-att-src="'data:image/png;base64,%s' % doc.house_photo" style="max-width:400px;max-height:300px;"/>
+        </t>
+      </div>
+    </t>
+
+    <t t-call="web.external_layout">
+      <div class="page">
+        <h3>System Description</h3>
+        <div t-field="doc.system_description" t-options="{'raw': True}"/>
+      </div>
+    </t>
+
+    <t t-call="web.external_layout">
+      <div class="page">
+        <h3>Quotation Items</h3>
+        <table class="table table-sm">
+          <thead>
+            <tr><th>Product</th><th>Qty</th><th>Unit Price</th><th>Subtotal</th></tr>
+          </thead>
+          <tbody>
+            <tr t-foreach="doc.order_line" t-as="line" t-if="line.product_id.quote_visibility == 'visible'">
+              <td><t t-esc="line.product_id.name"/></td>
+              <td class="text-center"><t t-esc="line.product_uom_qty"/></td>
+              <td class="text-right"><t t-field="line.price_unit" t-options="{'widget':'monetary','display_currency':doc.currency_id}"/></td>
+              <td class="text-right"><t t-field="line.price_subtotal" t-options="{'widget':'monetary','display_currency':doc.currency_id}"/></td>
+            </tr>
+            <tr t-if="doc.subsidy_amount">
+              <td colspan="3" class="text-right"><strong>Subsidy:</strong></td>
+              <td class="text-right"><t t-field="doc.subsidy_amount" t-options="{'widget':'monetary','display_currency':doc.currency_id}"/></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </t>
+
+    <t t-call="web.external_layout">
+      <div class="page">
+        <h3>Kit Details</h3>
+        <t t-foreach="doc.kit_bom_ids" t-as="kit">
+          <t t-if="kit.is_visible_in_quote">
+            <h4><t t-esc="kit.name"/></h4>
+            <t t-if="kit.marketing_image">
+              <img t-att-src="'data:image/png;base64,%s' % kit.marketing_image" style="max-width:400px;max-height:200px;"/>
+            </t>
+            <div t-field="kit.marketing_text" t-options="{'raw': True}"/>
+            <hr/>
+          </t>
+        </t>
+      </div>
+    </t>
+
+    <t t-call="web.external_layout">
+      <div class="page">
+        <h3>Terms and Conditions</h3>
+        <p>All work is subject to our standard terms and conditions. Payment is due within 30 days.</p>
+      </div>
+    </t>
+  </template>
+</odoo>

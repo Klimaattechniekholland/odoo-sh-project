@@ -14,6 +14,11 @@
           </group>
         </page>
       </xpath>
+        
+        <xpath expr="//page[@name='components']/field[@name='bom_line_ids']/list" position="inside">
+            <field name="show_in_quote"/>
+            <field name="component_price" readonly="1"/>
+        </xpath>
     </field>
   </record>
 </odoo>

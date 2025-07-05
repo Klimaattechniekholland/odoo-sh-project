@@ -1,3 +1,5 @@
+
+
 class BufferManager:
 	_internal_storage = {}  # Structure: {(user_id, key): item}
 	

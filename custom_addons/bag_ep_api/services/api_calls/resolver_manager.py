@@ -9,6 +9,7 @@ _logger = logging.getLogger(__name__)
 
 
 class ResolverManager:
+	
 	def __init__(self, partner, env = None):
 		self.partner = partner
 		self.env = env or partner.env
@@ -62,7 +63,9 @@ class ResolverManager:
 		
 		if self._bag_data and not self._warnings:
 			# get only one, first address
-			self._bag_data, self._warnings = BagApiResolver(self.partner).apply_from_data(self._bag_data, self._warnings)
+			self._bag_data, self._warnings = BagApiResolver(self.partner).apply_from_data(
+				self._bag_data, self._warnings
+				)
 			self._fetched_data = self._bag_data
 	
 	

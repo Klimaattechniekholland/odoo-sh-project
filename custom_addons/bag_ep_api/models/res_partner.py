@@ -5,6 +5,7 @@ from odoo import _, api, fields, models
 from odoo.addons.bag_ep_api.services.api_calls.base_resolver import BaseEpResolver
 from odoo.addons.bag_ep_api.services.api_calls.resolver_manager import ResolverManager
 from odoo.addons.bag_ep_api.utils.buffer_manager import BufferManager
+from odoo.addons.bag_ep_api.utils.filter_model_fields import filter_model_fields
 from odoo.exceptions import ValidationError
 from ..utils.format_dutch_zip import format_dutch_zip
 
@@ -105,19 +106,19 @@ class ResPartner(models.Model):
 				vals[key] = buffer[key]
 		
 		res = super().write(vals)
-		for record in self:
-			
-			if record.ep_lookup_status == 0 and self.env.context.get('install_mode') is not True:
-				raise ValidationError(_('EP Lookup status cannot be 0'))
-		
+		# for record in self:
+		#
+		# 	if record.ep_lookup_status == 0 and self.env.context.get('install_mode') is not True:
+		# 		raise ValidationError(_('EP Lookup status cannot be 0'))
+		#
 		return res
 	
 	
-	@api.constrains('ep_lookup_status')
-	def _check_ep_lookup_status(self):
-		for rec in self:
-			if rec.ep_lookup_status == 0:
-				raise ValidationError(_('EP Lookup status cannot be 0'))
+	# @api.constrains('ep_lookup_status')
+	# def _check_ep_lookup_status(self):
+	# 	for rec in self:
+	# 		if rec.ep_lookup_status == 0:
+	# 			raise ValidationError(_('EP Lookup status cannot be 0'))
 	
 	
 	
@@ -264,7 +265,7 @@ class ResPartner(models.Model):
 				result.setdefault('value', {})['ep_data_ids'] = self.ep_data_ids
 		
 		# Show a warning message if needed
-		if warnings:
+		if warnings and self._get_show_warnings():
 			result['warning'] = {
 				'title': " -- Warning -- ",
 				'message': "\n".join(warnings),
@@ -279,6 +280,11 @@ class ResPartner(models.Model):
 			).strip() or False
 		return api_recreate
 	
+	def _get_show_warnings(self):
+		api_show_warnings = self.env['ir.config_parameter'].sudo().with_context(company_id = self.env.company.id).get_param(
+			'bag_ep_api.ep_api_show_warnings', default = ''
+			).strip() or False
+		return api_show_warnings
 	
 	def _get_level_warnings(self):
 		api_level_warnings = self.env['ir.config_parameter'].sudo().with_context(

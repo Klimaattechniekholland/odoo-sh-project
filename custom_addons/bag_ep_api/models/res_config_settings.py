@@ -1,4 +1,5 @@
-from odoo import _, api, models, fields
+from odoo import _, api, fields, models
+
 
 # DRY constants
 EP_API_DEFAULT_URL = "https://public.ep-online.nl/api/v5/PandEnergielabel"
@@ -78,8 +79,10 @@ class ResConfigSettings(models.TransientModel):
 				# 'ep_api_url': params.get_param('bag_ep_api.ep_api_url', default = EP_API_DEFAULT_URL),
 				'ep_api_key': params.get_param('bag_ep_api.ep_api_key', default = ''),
 				'ep_api_recreate': params.get_param('bag_ep_api.ep_api_recreate', default = 'False') == 'True',
-				'ep_api_show_warnings': params.get_param('bag_ep_api.ep_api_show_warnings', default = 'False') == 'True',
-				'ep_api_level_warnings': params.get_param('bag_ep_api.ep_api_level_warnings', default = 'medium')
+				'ep_api_show_warnings': params.get_param(
+					'bag_ep_api.ep_api_show_warnings', default = 'False'
+					) == 'True',
+				# 'ep_api_level_warnings': params.get_param('bag_ep_api.ep_api_level_warnings', default = 'medium')
 				}
 			)
 		return res
@@ -97,38 +100,36 @@ class ResConfigSettings(models.TransientModel):
 		params.set_param('bag_ep_api.ep_api_key', self.ep_api_key or '')
 		params.set_param('bag_ep_api.ep_api_recreate', 'True' if self.ep_api_recreate else 'False')
 		params.set_param('bag_ep_api.ep_api_show_warnings', 'True' if self.ep_api_show_warnings else 'False')
-		params.set_param('bag_ep_api.ep_api_level_warnings', self.ep_api_level_warnings or 'medium')
+	# params.set_param('bag_ep_api.ep_api_level_warnings', self.ep_api_level_warnings or 'medium')
 
+# params.set_param('bag_ep_api.max_retries', str(self.max_retries))
+# params.set_param('bag_ep_api.retry_delay', str(self.retry_delay))
 
-	
-	# params.set_param('bag_ep_api.max_retries', str(self.max_retries))
-	# params.set_param('bag_ep_api.retry_delay', str(self.retry_delay))
-	
-	# @api.constrains('max_retries', 'retry_delay')
-	# def _check_positive_integers(self):
-	#     for rec in self:
-	#         if rec.max_retries < 0:
-	#             raise ValidationError(_("Max Retries must be a non-negative integer."))
-	#         if rec.retry_delay < 0:
-	#             raise ValidationError(_("Retry Delay must be a non-negative integer."))
-	
-	# @api.constrains('bag_api_url', 'zip_api_url', 'ep_api_url')
-	# def _check_valid_urls(self):
-	# 	for rec in self:
-	# 		for field_name in ['bag_api_url', 'zip_api_url', 'ep_api_url']:
-	# 			url = rec[field_name]
-	# 			if url and not url.startswith('https://'):
-	# 				raise ValidationError(
-	# 					_("%s must start with https://") % rec._fields[field_name].string
-	# 					)
+# @api.constrains('max_retries', 'retry_delay')
+# def _check_positive_integers(self):
+#     for rec in self:
+#         if rec.max_retries < 0:
+#             raise ValidationError(_("Max Retries must be a non-negative integer."))
+#         if rec.retry_delay < 0:
+#             raise ValidationError(_("Retry Delay must be a non-negative integer."))
 
-	# @api.onchange('max_retries', 'retry_delay')
-	# def _onchange_warn_invalid_retries(self):
-	#     if self.max_retries < 0 or self.retry_delay < 0:
-	#         return {
-	#             'warning': {
-	#                 'title': _("Invalid Input"),
-	#                 'message': _("Retry settings should be non-negative."),
-	#             }
-	#         }
-	#     return None
+# @api.constrains('bag_api_url', 'zip_api_url', 'ep_api_url')
+# def _check_valid_urls(self):
+# 	for rec in self:
+# 		for field_name in ['bag_api_url', 'zip_api_url', 'ep_api_url']:
+# 			url = rec[field_name]
+# 			if url and not url.startswith('https://'):
+# 				raise ValidationError(
+# 					_("%s must start with https://") % rec._fields[field_name].string
+# 					)
+
+# @api.onchange('max_retries', 'retry_delay')
+# def _onchange_warn_invalid_retries(self):
+#     if self.max_retries < 0 or self.retry_delay < 0:
+#         return {
+#             'warning': {
+#                 'title': _("Invalid Input"),
+#                 'message': _("Retry settings should be non-negative."),
+#             }
+#         }
+#     return None

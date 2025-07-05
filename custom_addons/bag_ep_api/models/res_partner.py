@@ -4,9 +4,7 @@ import re
 from odoo import _, api, fields, models
 from odoo.addons.bag_ep_api.services.api_calls.base_resolver import BaseEpResolver
 from odoo.addons.bag_ep_api.services.api_calls.resolver_manager import ResolverManager
-from odoo.addons.bag_ep_api.services.api_calls.zip_api_client import ZipApiResolver
 from odoo.addons.bag_ep_api.utils.buffer_manager import BufferManager
-from odoo.addons.bag_ep_api.utils.filter_model_fields import filter_model_fields
 from odoo.exceptions import ValidationError
 from ..utils.format_dutch_zip import format_dutch_zip
 
@@ -58,7 +56,11 @@ class ResPartner(models.Model):
 	
 	addressable_object = fields.Char(string = "Addressable Object", readonly = True)
 	
-	ep_lookup_status = fields.Integer(string = "EP Lookup status", readonly = True, default = 0)
+	ep_lookup_status = fields.Integer(
+		string = "EP Lookup status",
+		tracking = True,
+		readonly = True,
+		default = 0)
 	# 0 | not found
 	# 1 | ZIP found
 	# 2 | BAG found
@@ -103,12 +105,20 @@ class ResPartner(models.Model):
 				vals[key] = buffer[key]
 		
 		res = super().write(vals)
-		for rec in self:
+		for record in self:
 			
-			if rec.ep_lookup_status == 0:
+			if record.ep_lookup_status == 0 and self.env.context.get('install_mode') is not True:
 				raise ValidationError(_('EP Lookup status cannot be 0'))
 		
 		return res
+	
+	
+	@api.constrains('ep_lookup_status')
+	def _check_ep_lookup_status(self):
+		for rec in self:
+			if rec.ep_lookup_status == 0:
+				raise ValidationError(_('EP Lookup status cannot be 0'))
+	
 	
 	
 	@api.onchange('country_id')

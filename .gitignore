@@ -37,3 +37,5 @@ build/
 *.iml
 *.swp
 
+/clean_pyc.sh
+/translate_sync.sh

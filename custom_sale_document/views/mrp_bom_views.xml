@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<odoo>
+  <record id="view_mrp_bom_form_custom" model="ir.ui.view">
+    <field name="name">mrp.bom.form.custom</field>
+    <field name="model">mrp.bom</field>
+    <field name="inherit_id" ref="mrp.mrp_bom_form_view"/>
+    <field name="arch" type="xml">
+      <xpath expr="//sheet/notebook/page[@name='components']" position="after">
+        <page string="Marketing">
+          <group>
+            <field name="marketing_text"/>
+            <field name="marketing_image" widget="image" class="oe_avatar"/>
+            <field name="is_visible_in_quote"/>
+          </group>
+        </page>
+      </xpath>
+        
+        <xpath expr="//page[@name='components']/field[@name='bom_line_ids']/list" position="inside">
+            <field name="show_in_quote"/>
+            <field name="component_price" readonly="1"/>
+        </xpath>
+    </field>
+  </record>
+</odoo>

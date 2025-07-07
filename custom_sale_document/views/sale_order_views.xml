@@ -1,0 +1,41 @@
+<?xml version="1.0"?>
+<odoo>
+<record id="view_order_form_custom" model="ir.ui.view">
+    <field name="name">sale.order.form.custom</field>
+    <field name="model">sale.order</field>
+    <field name="inherit_id" ref="sale.view_order_form"/>
+    <field name="arch" type="xml">
+      <xpath expr="//notebook/page[last()]" position="after">
+        <page string="Custom Info">
+          <group>
+            <field name="house_photo" widget="image" class="oe_avatar"/>
+            <field name="system_description"/>
+            <field name="subsidy_amount"/>
+            <field name="meldcode"/>
+            <field name="contract_duration_months"/>
+            <field name="payment_frequency"/>
+            <field name="require_signature"/>
+          </group>
+          <group string="Selected Kits">
+            <field name="kit_bom_ids" widget="many2many_tags"/>
+          </group>
+        </page>
+      </xpath>
+    </field>
+  </record>
+<!--
+  <record id="view_sale_order_line_tree_custom" model="ir.ui.view">
+    <field name="name">sale.order.line.tree.custom</field>
+    <field name="model">sale.order.line</field>
+    <field name="inherit_id" ref="sale.view_order_line_form"/>
+    <field name="arch" type="xml">
+     <xpath expr="//field[@name='product_id']" position="attributes">
+    <attribute name="domain">
+        [('sale_ok', '=', True), ('quote_visibility', '=', 'visible')]
+    </attribute>
+    </xpath>
+    </field>
+</record>
+    -->
+
+</odoo>

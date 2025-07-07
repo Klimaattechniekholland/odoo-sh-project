@@ -1,4 +1,7 @@
-from odoo import fields, models
+from odoo import fields, models, api
+
+import logging
+_logger = logging.getLogger(__name__)
 
 class SaleOrder(models.Model):
     _inherit = 'sale.order'
@@ -44,12 +47,29 @@ class SaleOrder(models.Model):
         })
         return invoice_vals
 
+    @api.depends('order_line.product_id')
     def _compute_kit_boms(self):
+        """Compute all BOMs of type 'phantom' (kits) for products in order lines."""
         for order in self:
-            boms = self.env['mrp.bom']
+            kit_boms = self.env['mrp.bom']
+            _logger.info(f"Order: {order.name}")
             for line in order.order_line:
-                tmpl = line.product_id.product_tmpl_id
-                bom = self.env['mrp.bom']._bom_find(product=tmpl, company_id=order.company_id.id, bom_type='phantom')
-                if bom:
-                    boms |= bom
-            order.kit_bom_ids = boms
+                product = line.product_id
+                _logger.info(f"Checking product: {product.display_name} (ID: {product.id})")
+    
+                # BOMs on product
+                product_boms = product.bom_ids.filtered(
+                    lambda b: b.type == 'phantom' and b.company_id.id == order.company_id.id
+                )
+                _logger.info(f"Found {len(product_boms)} BOM(s) on product variant.")
+    
+                # BOMs on product template
+                template_boms = product.product_tmpl_id.bom_ids.filtered(
+                    lambda b: b.type == 'phantom' and b.company_id.id == order.company_id.id
+                )
+                _logger.info(f"Found {len(template_boms)} BOM(s) on product template.")
+    
+                kit_boms |= product_boms | template_boms
+    
+            _logger.info(f"Total kits found for order {order.name}: {len(kit_boms)}")
+            order.kit_bom_ids = kit_boms

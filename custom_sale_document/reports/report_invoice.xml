@@ -1,61 +1,199 @@
-<?xml version="1.0"?>
+<?xml version="1.0" encoding="utf-8"?>
 <odoo>
-  <template id="report_invoice_custom">
-    <t t-call="web.html_container">
-      <t t-foreach="docs" t-as="doc">
-        <t t-call="custom_sale_document.report_invoice_document" t-lang="doc.partner_id.lang"/>
-      </t>
-    </t>
-  </template>
+    <template id="report_invoice_document_custom" inherit_id="account.report_invoice_document" priority="100">
+        <xpath expr="/t/t[@t-call='web.external_layout']" position="replace">
 
-  <template id="report_invoice_document">
-    <t t-call="web.external_layout">
-      <div class="page">
-        <h2>Invoice: <t t-esc="doc.name"/></h2>
-        <p><strong>Customer:</strong> <t t-esc="doc.partner_id.name"/></p>
-        <p><strong>Date:</strong> <t t-esc="doc.invoice_date or doc.date"/></p>
-        <table class="table table-sm">
-          <thead>
-            <tr><th>Item</th><th>Qty</th><th>Unit Price</th><th>Taxes</th><th>Total</th></tr>
-          </thead>
-          <tbody>
-            <tr t-foreach="doc.invoice_line_ids" t-as="line">
-              <td><t t-esc="line.product_id.name"/></td>
-              <td class="text-center"><t t-esc="line.quantity"/></td>
-              <td class="text-right"><t t-field="line.price_unit" t-options="{'widget':'monetary','display_currency':doc.currency_id}"/></td>
-              <td class="text-right"><t t-field="line.price_tax" t-options="{'widget':'monetary','display_currency':doc.currency_id}"/></td>
-              <td class="text-right"><t t-field="line.price_subtotal" t-options="{'widget':'monetary','display_currency':doc.currency_id}"/></td>
-            </tr>
-            <tr t-if="doc.subsidy_amount">
-              <td colspan="4" class="text-right"><strong>Subsidy:</strong></td>
-              <td class="text-right"><t t-field="doc.subsidy_amount" t-options="{'widget':'monetary','display_currency':doc.currency_id}"/></td>
-            </tr>
-            <tr>
-              <td colspan="4" class="text-right"><strong>Total:</strong></td>
-              <td class="text-right"><t t-field="doc.amount_total" t-options="{'widget':'monetary','display_currency':doc.currency_id}"/></td>
-            </tr>
-          </tbody>
-        </table>
-        <div class="text-center" style="margin-top:20px;">
-          <p>Scan to review/approve this invoice:</p>
-          <img t-att-src="'/report/barcode/?barcode_type=QR&amp;value=%s' % doc.access_token" alt="QR Code" style="width:150px;height:150px;"/>
-        </div>
-      </div>
+            <!-- Context -->
+            <t t-set="o" t-value="o.with_context(lang=o.partner_id.lang)"/>
+            <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+            <t t-set="company" t-value="o.company_id"/>
+
+        <!--  HEADER  -->
+            <div class="header" style="padding: 20px; display: table; width: 100%; border-bottom: 3px solid #F38821; font-family: 'DejaVu Sans', Arial, sans-serif; color: #003366;">
+                <div style="display: table-row;">
+                    <!-- Left: Company Info -->
+                    <div style="display: table-cell; vertical-align: middle; text-align: left;">
+                        <h2 style="margin: 0; font-size: 22px; font-weight: bold;">
+                            <t t-if="company.name"><span t-field="company.name"/></t>
+                            <t t-else="">Klimaattechniek Holland B.V.</t>
+                        </h2>
+                        <p style="margin: 2px 0; font-size: 14px;">
+                            <t t-if="company.street">
+                                <span t-field="company.street"/>, <span t-field="company.zip"/> <span t-field="company.city"/>
+                            </t>
+                            <t t-else="">Keurenplein 4, 1069 CD Amsterdam</t>
+                        </p>
+                        <p style="margin: 2px 0; font-size: 14px;">
+                            <t t-if="company.vat"><span t-field="company.vat"/></t>
+                            <t t-else="">NL866258802B01</t>
+                            |
+                            <t t-if="company.phone"><span t-field="company.phone"/></t>
+                            <t t-else="">085-0601051</t>
+                        </p>
+                        <p style="margin: 2px 0; font-size: 14px;">
+                            <t t-if="company.bank_ids">
+                                <t t-foreach="company.bank_ids" t-as="bank">
+                                    <span t-field="bank.acc_number"/>
+                                </t>
+                            </t>
+                            <t t-else="">NL97INGB0105871834 | ABNANL2A</t>
+                        </p>
+                    </div>
+                    <!-- Right: Logo -->
+                    <div style="display: table-cell; vertical-align: middle; text-align: right;">
+                        <img t-if="company.logo" t-att-src="image_data_uri(company.logo)" style="height: 90px; max-height: 100px;" alt="Logo"/>
+                    </div>
+                </div>
+            </div>
+
+          <!-- PAGE 1: Invoice Summary + QR Code -->
+            <div class="page" style="padding: 30px; font-family: 'DejaVu Sans', Arial, sans-serif; font-size: 14px; color: #263859;">
+
+                <!-- Invoice Details -->
+                <div style="margin-bottom: 20px;">
+<h2 style="color: #003366; font-weight: bold; margin-bottom: 10px;">Invoice Summary</h2>
+
+                    <table style="width: 100%; border-collapse: collapse; font-size: 14px;">
+                        <tr>
+                            <td style="font-weight: bold;">Invoice Number:</td>
+                            <td><span t-field="o.name"/></td>
+                        </tr>
+                        <tr>
+                            <td style="font-weight: bold;">Invoice Date:</td>
+                            <td><span t-field="o.invoice_date"/></td>
+                        </tr>
+                        <tr>
+                            <td style="font-weight: bold;">Due Date:</td>
+                            <td><span t-field="o.invoice_date_due"/></td>
+                        </tr>
+                        <tr>
+                            <td style="font-weight: bold;">Customer:</td>
+                            <td><span t-field="o.partner_id.name"/></td>
+                        </tr>
+                       
+                    </table>
+                </div>
+
+                <!-- Invoice Lines -->
+                <div>
+                    <h3 style="color: #003366; margin-bottom: 10px;">Invoice Lines</h3>
+                    <table style="width: 100%; border-collapse: collapse; font-size: 14px; border: 1px solid #ddd;">
+                        <thead style="background-color: #F38821; color: #fff;">
+                            <tr>
+                                <th style="padding: 8px; text-align: left;">Description</th>
+                                <th style="padding: 8px; text-align: right;">Quantity</th>
+                                <th style="padding: 8px; text-align: right;">Unit Price</th>
+                                <th style="padding: 8px; text-align: right;">Total</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <t t-foreach="o.invoice_line_ids" t-as="line">
+                                <tr>
+                                    <td style="padding: 8px;"><span t-field="line.name"/></td>
+                                    <td style="padding: 8px; text-align: right;"><span t-field="line.quantity"/></td>
+                                    <td style="padding: 8px; text-align: right;"><span t-field="line.price_unit" t-options="{'widget': 'monetary', 'display_currency': o.currency_id}"/></td>
+                                    <td style="padding: 8px; text-align: right;"><span t-field="line.price_subtotal" t-options="{'widget': 'monetary', 'display_currency': o.currency_id}"/></td>
+                                </tr>
+                            </t>
+                        </tbody>
+                    </table>
+
+                    <div style="text-align: right; margin-top: 10px; font-weight: bold; font-size: 16px;">
+                        Total: <span t-field="o.amount_total" t-options="{'widget': 'monetary', 'display_currency': o.currency_id}"/>
+                    </div>
+                </div>
+
+                <!-- QR Code -->
+                <div style="text-align: center; margin-top: 30px;">
+                    <h4 style="color: #003366;">Scan to Pay</h4>
+                    <t t-if="o.qr_code">
+                        <img t-field="o.qr_code" t-options-widget="'image'" t-options-qweb_img_raw_data="1" style="max-width: 200px; border: 1px solid #ddd; padding: 8px; border-radius: 5px;" alt="QR Code"/>
+                    </t>
+                    <t t-else="">
+                        <p style="color: #999;">Demo QR Code Placeholder</p>
+                    </t>
+                </div>
+            </div>
+
+            <!-- PAGE 2: Conditions -->
+            <div class="page" style="page-break-before: always; padding: 40px; font-family: 'DejaVu Sans', Arial, sans-serif; font-size: 14px; color: #263859;">
+                <h2 style="text-align: center; color: #003366; margin-bottom: 20px; border-bottom: 2px solid #F38821; padding-bottom: 10px;">Conditions</h2>
+                <div style="line-height: 1.6; text-align: justify; background: #fdfdfd; border-radius: 6px; padding: 20px;">
+                    <t t-if="o.narration">
+                        <span t-field="o.narration"/>
+                    </t>
+                    <t t-else="">
+                        <p>Agreement and Execution<br/>Klimaattechniek Holland guarantees professional and certified installation services with clear agreements and no hidden surprises. Once an agreement is made, it is binding.</p>
+                        <p>Planning and Coordination<br/>After assignment confirmation, Klimaattechniek Holland will contact the client within 2 days to schedule the installation date...</p>
+                    </t>
+                </div>
+            </div>
+
+           <!-- PAGE 3: Kits Marketing Content | Client Portal Links -->
+<div class="page" style="page-break-before: always; padding: 40px; font-family: 'DejaVu Sans', Arial, sans-serif; font-size: 14px; color: #263859;">
+    <h2 style="text-align: center; color: #003366; margin-bottom: 20px; border-bottom: 2px solid #F38821; padding-bottom: 10px;">
+        Kits Documentation and Client Portal
+    </h2>
+
+    <!-- Kits Marketing Content -->
+    <t t-if="o.kit_bom_ids">
+        <t t-foreach="o.kit_bom_ids.filtered(lambda k: k.is_visible_in_quote)" t-as="kit">
+            <div style="margin-bottom: 30px;">
+                <h3 style="color: #F38821;"> <span t-field="kit.display_name"/></h3>
+                <t t-if="kit.marketing_image">
+                    <img t-att-src="image_data_uri(kit.marketing_image)" style="max-width: 400px; display: block; margin: 10px auto;" alt="Kit Marketing Image"/>
+                </t>
+                <div style="line-height: 1.6; text-align: justify;">
+                    <t t-if="kit.marketing_text">
+                        <div t-raw="kit.marketing_text"/>
+                    </t>
+                    <t t-else="">
+                        <p>No marketing description provided for this kit.</p>
+                    </t>
+                </div>
+
+                <!-- BOM Components marked for Quote -->
+                <h4 style="color: #003366; margin-top: 15px;">Components</h4>
+                <table style="width: 100%; border-collapse: collapse; font-size: 13px; border: 1px solid #ddd;">
+                    <thead style="background-color: #F38821; color: #fff;">
+                        <tr>
+                            <th style="padding: 6px; text-align: left;">Component</th>
+                            <th style="padding: 6px; text-align: right;">Quantity</th>
+                            <th style="padding: 6px; text-align: right;">Price</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <t t-foreach="kit.bom_line_ids.filtered(lambda l: l.show_in_quote)" t-as="component">
+                            <tr>
+                                <td style="padding: 6px;"> <span t-field="component.product_id.display_name"/></td>
+                                <td style="padding: 6px; text-align: right;"> <span t-field="component.product_qty"/></td>
+                                <td style="padding: 6px; text-align: right;"> <span t-field="component.component_price" t-options="{'widget': 'monetary', 'display_currency': o.currency_id}"/></td>
+                            </tr>
+                        </t>
+                    </tbody>
+                </table>
+            </div>
+        </t>
+    </t>
+    <t t-else="">
+        <p style="text-align: center; color: #999;">No kits marketing data available.</p>
     </t>
 
-    <t t-call="web.external_layout">
-      <div class="page">
-        <h3>Terms and Payment</h3>
-        <p>Payment due by bank transfer within 30 days.</p>
-        <t t-if="doc.invoice_variant == 'installation'">
-          <h4>Installation Notes</h4>
-          <p>This invoice covers the installation of the system.</p>
-        </t>
-        <t t-if="doc.invoice_variant == 'service'">
-          <h4>Service Details</h4>
-          <p>This invoice covers service and maintenance.</p>
-        </t>
-      </div>
-    </t>
-  </template>
+    <!-- Client Portal Links -->
+    <div style="margin-top: 40px;">
+        <h3 style="color: #003366;">Client Support and Documentation</h3>
+        <ul style="line-height: 1.8;">
+            <li>Link to Documentation of the sold/invoiced Kits .</li>
+            <li>Link to Small manual for using the sold Kit.</li>
+        </ul>
+    </div>
+</div>
+
+            <!-- FOOTER -->
+            <div class="footer" style="padding: 20px 50px; border-top: 2px solid #F38821; text-align: center; color: #003366; font-size: 12px;">
+                <p><t t-esc="company.name"/> | <t t-esc="company.street"/>, <t t-esc="company.zip"/> <t t-esc="company.city"/> | Phone: <t t-esc="company.phone"/> | Email: <t t-esc="company.email"/></p>
+            </div>
+
+        </xpath>
+    </template>
 </odoo>

@@ -11,9 +11,10 @@ class MrpBomLine(models.Model):
     _inherit = 'mrp.bom.line'
 
     show_in_quote = fields.Boolean(string='Show in Quote')
-    component_price = fields.Monetary(
-        string='Component Price',
+    component_price = fields.Float(
         related='product_id.list_price',
-        currency_field='product_id.currency_id',
-        readonly=True
+        string='Component Price',
+        readonly=True,
+        store=True,
+        help='Automatically gets price from the linked product'
     )

@@ -5,8 +5,9 @@
         <field name="model">account.move</field>
         <field name="inherit_id" ref="account.view_move_form"/>
         <field name="arch" type="xml">
-            <xpath expr="//sheet" position="inside">
-                <group string="Custom Fields">
+      <xpath expr="//notebook/page[last()]" position="after">
+        <page string="Custom Info">
+            <group string="Invoice Infos">
                     <field name="invoice_variant"/>
                     <field name="house_photo" widget="image"/>
                     <field name="system_description"/>
@@ -15,7 +16,11 @@
                     <field name="contract_duration_months"/>
                     <field name="payment_frequency"/>
                     <field name="require_signature"/>
-                </group>
+          </group>
+          <group string="Selected Kits">
+            <field name="kit_bom_ids" widget="many2many_tags"/>
+          </group>
+        </page>
             </xpath>
         </field>
     </record>

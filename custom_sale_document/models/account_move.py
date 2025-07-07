@@ -29,10 +29,20 @@ class AccountMove(models.Model):
 
     def _compute_kit_boms(self):
         for move in self:
-            boms = self.env['mrp.bom']
+            kit_boms = self.env['mrp.bom']
             for line in move.invoice_line_ids:
-                tmpl = line.product_id.product_tmpl_id
-                bom = self.env['mrp.bom']._bom_find(product=tmpl, company_id=move.company_id.id, bom_type='phantom')
-                if bom:
-                    boms |= bom
-            move.kit_bom_ids = boms
+                product = line.product_id
+    
+                # BOMs on product variant
+                product_boms = product.bom_ids.filtered(
+                    lambda b: b.type == 'phantom' and b.company_id.id == move.company_id.id
+                )
+    
+                # BOMs on product template
+                template_boms = product.product_tmpl_id.bom_ids.filtered(
+                    lambda b: b.type == 'phantom' and b.company_id.id == move.company_id.id
+                )
+    
+                kit_boms |= product_boms | template_boms
+    
+            move.kit_bom_ids = kit_boms

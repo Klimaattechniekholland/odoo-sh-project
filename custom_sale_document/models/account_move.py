@@ -16,7 +16,8 @@ class AccountMove(models.Model):
     invoice_variant = fields.Selection(
         [('installation', 'Installation'), ('service', 'Service')],
         string='Invoice Variant',
-        default='installation'
+        default='installation',
+        required=True,
     )
     contract_duration_months = fields.Integer(string='Contract Duration (Months)', default=12)
     payment_frequency = fields.Selection(

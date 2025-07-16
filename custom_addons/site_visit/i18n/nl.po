@@ -1,0 +1,101 @@
+# Dutch translation for Site Visit module
+msgid ""
+msgstr ""
+"Project-Id-Version: site_visit\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: nl\n"
+"MIME-Version: 1.0\n"
+
+msgid "Visit Reference"
+msgstr "Bezoekreferentie"
+
+msgid "Customer"
+msgstr "Klant"
+
+msgid "Visit Date"
+msgstr "Bezoekdatum"
+
+msgid "Photos"
+msgstr "Foto's"
+
+msgid "Technician"
+msgstr "Technicus"
+
+msgid "Heat Pump Present"
+msgstr "Warmtepomp aanwezig"
+
+msgid "Airco Present"
+msgstr "Airco aanwezig"
+
+msgid "Battery Present"
+msgstr "Batterij aanwezig"
+
+msgid "CV Present"
+msgstr "CV aanwezig"
+
+msgid "Latitude"
+msgstr "Breedtegraad"
+
+msgid "Longitude"
+msgstr "Lengtegraad"
+
+msgid "System Type"
+msgstr "Systeemtype"
+
+msgid "Component"
+msgstr "Component"
+
+msgid "Checklist Item"
+msgstr "Controlepunt"
+
+msgid "Description"
+msgstr "Beschrijving"
+
+msgid "Photo"
+msgstr "Foto"
+
+msgid "Details / Observation"
+msgstr "Details / Opmerking"
+
+msgid "Site Visit"
+msgstr "Sitebezoek"
+
+msgid "Site Visits"
+msgstr "Sitebezoeken"
+
+msgid "Installation Photos"
+msgstr "Installatiefoto's"
+
+msgid "Manage Visits"
+msgstr "Bezoeken beheren"
+
+msgid "Heat Pump"
+msgstr "Warmtepomp"
+
+msgid "Airco"
+msgstr "Airco"
+
+msgid "Battery"
+msgstr "Batterij"
+
+msgid "CV"
+msgstr "CV"
+
+msgid "Search Photos"
+msgstr "Foto's zoeken"
+
+msgid "Site Visit Report"
+msgstr "Rapport Sitebezoek"
+
+msgid "Send Report by Email"
+msgstr "Rapport per e-mail verzenden"
+
+msgid "Dashboard"
+msgstr "Dashboard"
+
+msgid "Auto Email Site Visit Report"
+msgstr "Automatische e-mail sitebezoekrapport"
+
+msgid "Send Site Visit Report on Done"
+msgstr "Rapporteer sitebezoek bij afronding"

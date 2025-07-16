@@ -1,0 +1,7 @@
+<odoo>
+    <data>
+        <report id="action_report_site_visit" string="Site Visit Report" model="site.visit" report_type="qweb-pdf"
+                name="site_visit.report_site_visit_document" file="site_visit.report_site_visit_document"
+                print_report_name="'SiteVisit_' + object.name"/>
+    </data>
+</odoo>

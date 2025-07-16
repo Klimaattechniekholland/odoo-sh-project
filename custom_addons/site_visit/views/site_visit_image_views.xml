@@ -1,0 +1,64 @@
+<odoo>
+    <data>
+        <record id="view_kanban_site_visit_image" model="ir.ui.view">
+            <field name="name">site.visit.image.kanban</field>
+            <field name="model">site.visit.image</field>
+            <field name="arch" type="xml">
+                <kanban>
+                    <field name="category_id"/>
+                    <field name="image"/>
+                    <field name="note"/>
+                    <templates>
+                        <t t-name="kanban-box">
+                            <div class="oe_kanban_global_click">
+                                <div>
+                                    <img t-att-src="'data:image/png;base64,%s' % record.image.raw_value"
+                                         class="oe_kanban_image" style="height: 150px;"/>
+                                </div>
+                                <div class="o_kanban_record_title">
+                                    <strong><field name="category_id"/></strong><br/>
+                                    <field name="note"/>
+                                </div>
+                            </div>
+                        </t>
+                    </templates>
+                </kanban>
+            </field>
+        </record>
+
+        <record id="view_search_site_visit_image" model="ir.ui.view">
+            <field name="name">site.visit.image.search</field>
+            <field name="model">site.visit.image</field>
+            <field name="arch" type="xml">
+                <search string="Search Photos">
+                    <field name="category_id"/>
+                    <field name="visit_id"/>
+                    <filter name="heatpump" string="Heat Pump" domain="[('category_id','=','heatpump')]"/>
+                    <filter name="airco" string="Airco" domain="[('category_id','=','airco')]"/>
+                    <filter name="battery" string="Battery" domain="[('category_id','=','battery')]"/>
+                    <filter name="cv" string="CV" domain="[('category_id','=','cv')]"/>
+                </search>
+            </field>
+        </record>
+
+        <record id="view_kanban_site_visit_image_mobile" model="ir.ui.view">
+            <field name="name">site.visit.image.kanban.mobile</field>
+            <field name="model">site.visit.image</field>
+            <field name="arch" type="xml">
+                <kanban class="o_kanban_mobile">
+                    <field name="image"/>
+                    <templates>
+                        <t t-name="kanban-box">
+                            <div class="oe_kanban_global_click">
+                                <img t-att-src="'data:image/png;base64,%s' % record.image.raw_value"
+                                     style="max-height:100px;"/>
+                                <strong><field name="category_id"/></strong> / <field name="component_id"/>
+                                <p><field name="note"/></p>
+                            </div>
+                        </t>
+                    </templates>
+                </kanban>
+            </field>
+        </record>
+    </data>
+</odoo>

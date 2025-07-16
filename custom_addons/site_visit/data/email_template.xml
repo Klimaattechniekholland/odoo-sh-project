@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <record id="email_template_site_visit" model="mail.template">
+            <field name="name">Site Visit Notification</field>
+            <field name="model_id" ref="model_site_visit"/>
+            <field name="subject">Site Visit Notification</field>
+            <field name="email_from">${object.user_id.email or ''}</field>
+            <field name="email_to">${object.partner_id.email or ''}</field>
+            <field name="body_html">
+                <![CDATA[
+                    <p>Dear ${object.partner_id.name},</p>
+                    <p>A new site visit has been scheduled.</p>
+                    <p>Visit details: ${object.name}</p>
+                ]]>
+            </field>
+        </record>
+
+    </data>
+</odoo>

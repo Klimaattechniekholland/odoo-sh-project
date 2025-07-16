@@ -1,0 +1,34 @@
+<odoo>
+    <data>
+        <record id="cat_heatpump" model="site.inspection.category">
+            <field name="name">Heat Pump</field>
+        </record>
+        <record id="cat_cv" model="site.inspection.category">
+            <field name="name">CV</field>
+        </record>
+
+        <record id="comp_outdoor" model="site.inspection.component">
+            <field name="name">Outdoor Unit</field>
+            <field name="category_id" ref="cat_heatpump"/>
+        </record>
+        <record id="comp_buffer" model="site.inspection.component">
+            <field name="name">Buffer</field>
+            <field name="category_id" ref="cat_heatpump"/>
+        </record>
+        <record id="comp_rookgas" model="site.inspection.component">
+            <field name="name">Rookgasafvoer</field>
+            <field name="category_id" ref="cat_cv"/>
+        </record>
+
+        <record id="tmpl_leak_test" model="site.inspection.point.template">
+            <field name="name">Leak Test</field>
+            <field name="category_id" ref="cat_heatpump"/>
+            <field name="component_id" ref="comp_outdoor"/>
+        </record>
+        <record id="tmpl_connection_diameter" model="site.inspection.point.template">
+            <field name="name">Connection Diameter</field>
+            <field name="category_id" ref="cat_cv"/>
+            <field name="component_id" ref="comp_rookgas"/>
+        </record>
+    </data>
+</odoo>

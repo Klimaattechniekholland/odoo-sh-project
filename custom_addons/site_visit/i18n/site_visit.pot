@@ -1,0 +1,82 @@
+# Translation template for Site Visit
+msgid ""
+msgstr ""
+"Project-Id-Version: site_visit\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+
+# Field labels
+msgid "Visit Reference"
+msgstr ""
+
+msgid "Customer"
+msgstr ""
+
+msgid "Visit Date"
+msgstr ""
+
+msgid "Photos"
+msgstr ""
+
+msgid "Technician"
+msgstr ""
+
+msgid "Heat Pump Present"
+msgstr ""
+
+msgid "Airco Present"
+msgstr ""
+
+msgid "Battery Present"
+msgstr ""
+
+msgid "CV Present"
+msgstr ""
+
+msgid "Latitude"
+msgstr ""
+
+msgid "Longitude"
+msgstr ""
+
+msgid "System Type"
+msgstr ""
+
+msgid "Description"
+msgstr ""
+
+msgid "Photo"
+msgstr ""
+
+# Views and menus
+msgid "Site Visit"
+msgstr ""
+
+msgid "Site Visits"
+msgstr ""
+
+msgid "Installation Photos"
+msgstr ""
+
+msgid "Manage Visits"
+msgstr ""
+
+msgid "Heat Pump"
+msgstr ""
+
+msgid "Airco"
+msgstr ""
+
+msgid "Battery"
+msgstr ""
+
+msgid "CV"
+msgstr ""
+
+msgid "Search Photos"
+msgstr ""
+
+msgid "Site Visit Report"
+msgstr ""

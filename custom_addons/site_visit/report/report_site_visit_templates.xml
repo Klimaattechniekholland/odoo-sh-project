@@ -1,0 +1,38 @@
+<odoo>
+    <data>
+        <template id="report_site_visit_document">
+            <t t-call="web.html_container">
+                <t t-foreach="docs" t-as="doc">
+                    <div class="page">
+                        <h2>Site Visit: <t t-esc="doc.name"/></h2>
+                        <p><strong>Customer:</strong> <t t-esc="doc.customer_id.name"/></p>
+                        <p><strong>Date:</strong> <t t-esc="doc.visit_date"/></p>
+                        <p><strong>Technician:</strong> <t t-esc="doc.technician_id.name"/></p>
+                        <t t-if="doc.image_ids">
+                            <h3>Photos:</h3>
+                            <t t-foreach="doc.image_ids" t-as="photo">
+                                <div style="margin-bottom: 20px;">
+                                    <p><strong>System:</strong> <t t-esc="photo.category"/></p>
+                                    <img t-att-src="'data:image/png;base64,%s' % photo.image"
+                                         style="max-height:300px; max-width:100%;"/>
+                                    <p><em><t t-esc="photo.note"/></em></p>
+                                    <t t-if="photo.point_ids">
+                                        <h4>Inspection Points:</h4>
+                                        <t t-foreach="photo.point_ids" t-as="point">
+                                            <div style="margin-bottom:10px;">
+                                                <p><strong><t t-esc="point.description"/></strong></p>
+                                                <img t-att-src="'data:image/png;base64,%s' % point.photo"
+                                                     style="max-height:150px; max-width:100%;"/>
+                                                <p><t t-esc="point.note"/></p>
+                                            </div>
+                                        </t>
+                                    </t>
+                                </div>
+                            </t>
+                        </t>
+                    </div>
+                </t>
+            </t>
+        </template>
+    </data>
+</odoo>

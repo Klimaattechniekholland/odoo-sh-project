@@ -1,0 +1,10 @@
+<odoo>
+    <data>
+        <record id="seq_site_visit" model="ir.sequence">
+            <field name="name">Site Visit</field>
+            <field name="code">site.visit</field>
+            <field name="prefix">SV/</field>
+            <field name="padding">4</field>
+        </record>
+    </data>
+</odoo>

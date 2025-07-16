@@ -1,0 +1,41 @@
+<odoo>
+    <!-- Top-level Menu -->
+    <menuitem id="menu_site_visit_root"
+              name="Site Visits"
+              sequence="10"
+              web_icon="site_visit/static/description/icon64.png"/>
+
+    <!-- Submenu (can be a dashboard or a model list) -->
+    <menuitem id="menu_site_visit_visits"
+              name="Visits"
+              parent="menu_site_visit_root"
+              action="action_site_visit"
+              sequence="20"/>
+
+    <!-- Submenu Configuration, with subs Categories, Components, Points-->
+    <menuitem id="menu_site_visit_configuration"
+              name="Configuration"
+              parent="menu_site_visit_root"
+              sequence="30"/>
+
+    <!-- Submenu Categories -->
+    <menuitem id="menu_site_visit_categories"
+              name="Categories"
+              parent="menu_site_visit_configuration"
+              action="action_site_visit"
+              sequence="10"/>
+
+    <!-- Submenu Components -->
+     <menuitem id="menu_site_visit_components"
+              name="Components"
+              parent="menu_site_visit_configuration"
+              action="action_site_inspection_component"
+              sequence="20"/>
+
+    <!-- Submenu Points -->
+     <menuitem id="menu_site_visit_points"
+              name="Points"
+              parent="menu_site_visit_configuration"
+              action="action_site_visit"
+              sequence="30"/>
+</odoo>

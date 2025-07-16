@@ -1,5 +1,11 @@
 from odoo import models, fields
 
+
+import logging
+_logger = logging.getLogger(__name__)
+_logger.warning("📢 Registering SiteVisitInspectionComponent")
+
+
 class SiteVisitInspectionComponent(models.Model):
     _name = 'site.visit.inspection.component'
     _description = 'Site Visit Component'

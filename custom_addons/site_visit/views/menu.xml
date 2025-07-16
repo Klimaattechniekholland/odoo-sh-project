@@ -26,16 +26,38 @@
               sequence="10"/>
 
     <!-- Submenu Components -->
-     <menuitem id="menu_site_visit_components"
+    <menuitem id="menu_site_visit_components"
               name="Components"
               parent="menu_site_visit_configuration"
               action="action_site_inspection_component"
               sequence="20"/>
 
     <!-- Submenu Points -->
-     <menuitem id="menu_site_visit_points"
+    <menuitem id="menu_site_visit_points"
               name="Points"
               parent="menu_site_visit_configuration"
               action="action_site_visit"
               sequence="30"/>
+
+
+    <menuitem id="menu_site_visit_dev"
+              name="Developer Tools"
+              parent="menu_site_visit_root"
+              groups="base.group_system"
+              sequence="100"/>
+
+<!--    <menuitem id="menu_site_visit_acl_refresh"-->
+<!--              name="Refresh ACLs"-->
+<!--              parent="menu_site_visit_dev"-->
+<!--              action="action_refresh_site_visit_acls"-->
+<!--              groups="base.group_system"-->
+<!--              sequence="10"/>-->
+
+    <menuitem id="menu_site_visit_acl_refresh"
+          name="Refresh ACLs"
+          parent="menu_site_visit_dev"
+          action="action_acl_refresh_wizard"
+          groups="base.group_system"
+          sequence="10"/>
+
 </odoo>

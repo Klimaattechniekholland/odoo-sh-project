@@ -1,5 +1,10 @@
 from odoo import models, fields
 
+
+import logging
+_logger = logging.getLogger(__name__)
+_logger.warning("📢 Registering SiteVisitImagePoint")
+
 class SiteVisitImagePoint(models.Model):
     _name = 'site.visit.image.point'
     _description = 'Site Visit Inspection Point'

@@ -12,25 +12,10 @@ def setup_site_visit_rights(env):
 		_logger.warning("❌ Could not find group 'base.group_system'")
 		return
 	
-	# Search all models starting with site_visit or defined under your module
-	model_names = [
-		'site.visit',
-		'site.visit.inspection.category',
-		'site.visit.inspection.component',
-		'site.visit.inspection.point',
-		'site.visit.inspection.image'
-		'site.visit.inspection.image.point',
-		]
-	
-	models = env['ir.model'].search(
-		[
-			('model', 'in', model_names)
-			]
-		)
-	
-	# models = env['ir.model'].search([
-	#     ('model', 'ilike', 'site.visit.%')  # or use 'site.%', etc.
-	# ])
+		
+	models = env['ir.model'].search([
+	    ('model', 'ilike', 'site.visit.%')  # or use 'site.%', etc.
+	])
 	
 	if not models:
 		_logger.warning("⚠️ No models found matching 'site_visit%'")

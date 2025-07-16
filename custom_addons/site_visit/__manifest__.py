@@ -11,11 +11,16 @@
 	
 	'data': [
 		
+		'security/ir.model.access.csv',
+		
 		'data/email_template.xml',
 		'data/automated_email.xml',
 		
 		
 		'views/actions.xml',
+		
+		'views/acl_refresh_wizard.xml',
+		
 		'views/menu.xml',
 		
 		'views/site_visit_inspection_category_views.xml',

@@ -1,5 +1,10 @@
 from odoo import models, fields
 
+import logging
+_logger = logging.getLogger(__name__)
+_logger.warning("📢 Registering SiteVisit")
+
+
 class SiteVisit(models.Model):
     _inherit = ['mail.thread', 'mail.activity.mixin']
     _name = 'site.visit'

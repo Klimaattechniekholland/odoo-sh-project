@@ -1,5 +1,13 @@
 from odoo import models, fields, api
 
+
+
+import logging
+_logger = logging.getLogger(__name__)
+_logger.warning("📢 Registering SiteVisitImage")
+
+
+
 class SiteVisitImage(models.Model):
     _name = 'site.visit.image'
     _description = 'Site Visit Image'

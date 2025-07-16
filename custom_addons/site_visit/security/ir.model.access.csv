@@ -1,0 +1,2 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_acl_refresh_admin,site_visit.acl.refresh,model_site_visit_acl_refresh,base.group_system,1,1,1,1

@@ -9,15 +9,21 @@
                         <field name="group_id"/>
                     </group>
                     <footer>
-                        <button name="refresh_acls" type="object" string="Apply ACLs" class="btn-primary" create="0"/>
-                        <button string="Cancel" special="cancel" class="btn-secondary"/>
+                        <button string="Refresh ACLs"
+                                type="object"
+                                name="refresh_acls"
+                                class="btn-primary"
+                                create="0"/>
+
+
+                        <button string="Cancel" class="btn-secondary" special="cancel"/>
                     </footer>
                 </form>
             </field>
         </record>
 
         <record id="action_acl_refresh_wizard" model="ir.actions.act_window">
-            <field name="name">ACL Refresh</field>
+            <field name="name">Refresh ACLs</field>
             <field name="res_model">site_visit.acl.refresh</field>
             <field name="view_mode">form</field>
             <field name="target">new</field>

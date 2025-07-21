@@ -9,13 +9,13 @@
       <field name="name">site.visit.template.category.kanban</field>
       <field name="model">site.visit.template.category</field>
       <field name="arch" type="xml">
-        <kanban default_group_by="template_id" class="o_kanban_view" group_create="true" group_deletable="true" group_editable="true">
-          <field name="name" string="category-name"/>
+        <kanban default_group_by="template_id">
+          <field name="name"/>
           <field name="component_ids"/>
           <templates>
             <t t-name="kanban-box">
               <div class="oe_kanban_global_click o_kanban_card">
-                <strong><field name="name" string="category-name"/></strong><br/>
+                <strong><field name="name"/></strong><br/>
                 <t t-if="record.component_ids.raw_value">
                   <span>Components: <t t-esc="record.component_ids.raw_value.length"/></span>
                 </t>
@@ -30,8 +30,8 @@
       <field name="name">site.visit.template.category.list</field>
       <field name="model">site.visit.template.category</field>
       <field name="arch" type="xml">
-        <list editable="top">
-          <field name="name" string="category-name"/>
+        <list>
+          <field name="name"/>
           <field name="template_id"/>
         </list>
       </field>
@@ -44,10 +44,18 @@
         <form string="Category">
           <sheet>
             <group>
-              <field name="name" string="category-name"/>
+              <field name="name"/>
               <field name="template_id"/>
             </group>
-            <field name="component_ids" context="{'default_view_mode': 'kanban'}"/>
+            <notebook>
+              <page string="Components">
+                <field name="component_ids"
+                       context="{'default_category_id': id}"
+                       widget="one2many"
+                       mode="kanban,list"
+                       view_mode="kanban,list"/>
+              </page>
+            </notebook>
           </sheet>
         </form>
       </field>
@@ -61,14 +69,14 @@
       <field name="name">site.visit.template.component.kanban</field>
       <field name="model">site.visit.template.component</field>
       <field name="arch" type="xml">
-        <kanban default_group_by="category_id" class="o_kanban_view" group_create="true" group_deletable="true" group_editable="true">
-          <field name="name" string="component-name"/>
+        <kanban>
+          <field name="name"/>
           <field name="point_ids"/>
           <field name="sequence"/>
           <templates>
             <t t-name="kanban-box">
               <div class="oe_kanban_global_click o_kanban_card">
-                <strong><field name="name" string="component-name"/></strong><br/>
+                <strong><field name="name"/></strong><br/>
                 <t t-if="record.point_ids.raw_value">
                   <span>Points: <t t-esc="record.point_ids.raw_value.length"/></span>
                 </t>
@@ -83,8 +91,8 @@
       <field name="name">site.visit.template.component.list</field>
       <field name="model">site.visit.template.component</field>
       <field name="arch" type="xml">
-        <list editable="top">
-          <field name="name" string="component-name"/>
+        <list>
+          <field name="name"/>
           <field name="category_id"/>
           <field name="sequence" widget="handle"/>
         </list>
@@ -98,11 +106,15 @@
         <form string="Component">
           <sheet>
             <group>
-              <field name="name" string="component-name"/>
+              <field name="name"/>
               <field name="category_id"/>
               <field name="sequence"/>
             </group>
-            <field name="point_ids" context="{'default_view_mode': 'kanban'}"/>
+            <field name="point_ids"
+                   widget="one2many"
+                   context="{'default_component_id': id}"
+                   mode="kanban,list"
+                   view_mode="kanban,list"/>
           </sheet>
         </form>
       </field>
@@ -116,14 +128,14 @@
       <field name="name">site.visit.template.point.kanban</field>
       <field name="model">site.visit.template.point</field>
       <field name="arch" type="xml">
-        <kanban  default_group_by="component_id"  class="o_kanban_view" group_create="true" group_deletable="true" group_editable="true">
-          <field name="name" string="point-name"/>
+        <kanban>
+          <field name="name"/>
           <field name="component_id"/>
           <field name="sequence"/>
           <templates>
             <t t-name="kanban-box">
               <div class="oe_kanban_global_click o_kanban_card">
-                <strong><field name="name" string="point-name"/></strong><br/>
+                <strong><field name="name"/></strong><br/>
                 <field name="component_id"/>
               </div>
             </t>
@@ -136,8 +148,8 @@
       <field name="name">site.visit.template.point.list</field>
       <field name="model">site.visit.template.point</field>
       <field name="arch" type="xml">
-        <list editable="top">
-          <field name="name" string="point-name"/>
+        <list>
+          <field name="name"/>
           <field name="component_id"/>
           <field name="sequence" widget="handle"/>
         </list>
@@ -151,7 +163,7 @@
         <form string="Point">
           <sheet>
             <group>
-              <field name="name" string="point-name"/>
+              <field name="name"/>
               <field name="component_id"/>
               <field name="sequence"/>
             </group>

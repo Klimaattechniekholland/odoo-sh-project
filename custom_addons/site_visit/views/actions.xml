@@ -32,6 +32,33 @@
             <field name="view_mode">list,form</field>
         </record>
 
+        <!-- Templates Action -->
+        <record id="action_site_visit_template" model="ir.actions.act_window">
+            <field name="name">Templates</field>
+            <field name="res_model">site.visit.template</field>
+            <field name="view_mode">list,form</field>
+        </record>
+
+        <!-- Templates Action Category-->
+        <record id="action_site_visit_categories" model="ir.actions.act_window">
+            <field name="name">Categories</field>
+            <field name="res_model">site.visit.template.category</field>
+            <field name="view_mode">kanban,list,form</field>
+        </record>
+
+        <!-- Templates Action Component-->
+        <record id="action_site_visit_components" model="ir.actions.act_window">
+            <field name="name">Components</field>
+            <field name="res_model">site.visit.template.component</field>
+            <field name="view_mode">kanban,list,form</field>
+        </record>
+
+        <!-- Templates Action Point-->
+        <record id="action_site_visit_points" model="ir.actions.act_window">
+            <field name="name">Points</field>
+            <field name="res_model">site.visit.template.point</field>
+            <field name="view_mode">kanban,list,form</field>
+        </record>
 
         <!-- Server Action to run the ACL refresh -->
         <record id="action_refresh_site_visit_acls" model="ir.actions.server">

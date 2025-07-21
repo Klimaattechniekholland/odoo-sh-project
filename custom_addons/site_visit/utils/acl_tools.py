@@ -5,7 +5,9 @@ _logger = logging.getLogger(__name__)
 
 
 def apply_acl_rules(env, group, is_admin = False):
-	models = env['ir.model'].search([('modules', '=', 'site_visit')])
+	
+	models = env['ir.model'].search([('model', 'like', 'site.visit.%')])
+	
 	if not models:
 		_logger.warning("⚠ No models found for module 'site_visit'")
 		return

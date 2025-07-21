@@ -1,0 +1,164 @@
+<odoo>
+  <data>
+
+    <!-- ============================= -->
+    <!-- CATEGORY VIEWS -->
+    <!-- ============================= -->
+
+    <record id="view_category_kanban" model="ir.ui.view">
+      <field name="name">site.visit.template.category.kanban</field>
+      <field name="model">site.visit.template.category</field>
+      <field name="arch" type="xml">
+        <kanban default_group_by="template_id" class="o_kanban_view" group_create="true" group_deletable="true" group_editable="true">
+          <field name="name" string="category-name"/>
+          <field name="component_ids"/>
+          <templates>
+            <t t-name="kanban-box">
+              <div class="oe_kanban_global_click o_kanban_card">
+                <strong><field name="name" string="category-name"/></strong><br/>
+                <t t-if="record.component_ids.raw_value">
+                  <span>Components: <t t-esc="record.component_ids.raw_value.length"/></span>
+                </t>
+              </div>
+            </t>
+          </templates>
+        </kanban>
+      </field>
+    </record>
+
+    <record id="view_category_list" model="ir.ui.view">
+      <field name="name">site.visit.template.category.list</field>
+      <field name="model">site.visit.template.category</field>
+      <field name="arch" type="xml">
+        <list editable="top">
+          <field name="name" string="category-name"/>
+          <field name="template_id"/>
+        </list>
+      </field>
+    </record>
+
+    <record id="view_category_form" model="ir.ui.view">
+      <field name="name">site.visit.template.category.form</field>
+      <field name="model">site.visit.template.category</field>
+      <field name="arch" type="xml">
+        <form string="Category">
+          <sheet>
+            <group>
+              <field name="name" string="category-name"/>
+              <field name="template_id"/>
+            </group>
+            <field name="component_ids" context="{'default_view_mode': 'kanban'}"/>
+          </sheet>
+        </form>
+      </field>
+    </record>
+
+    <!-- ============================= -->
+    <!-- COMPONENT VIEWS -->
+    <!-- ============================= -->
+
+    <record id="view_component_kanban" model="ir.ui.view">
+      <field name="name">site.visit.template.component.kanban</field>
+      <field name="model">site.visit.template.component</field>
+      <field name="arch" type="xml">
+        <kanban default_group_by="category_id" class="o_kanban_view" group_create="true" group_deletable="true" group_editable="true">
+          <field name="name" string="component-name"/>
+          <field name="point_ids"/>
+          <field name="sequence"/>
+          <templates>
+            <t t-name="kanban-box">
+              <div class="oe_kanban_global_click o_kanban_card">
+                <strong><field name="name" string="component-name"/></strong><br/>
+                <t t-if="record.point_ids.raw_value">
+                  <span>Points: <t t-esc="record.point_ids.raw_value.length"/></span>
+                </t>
+              </div>
+            </t>
+          </templates>
+        </kanban>
+      </field>
+    </record>
+
+    <record id="view_component_list" model="ir.ui.view">
+      <field name="name">site.visit.template.component.list</field>
+      <field name="model">site.visit.template.component</field>
+      <field name="arch" type="xml">
+        <list editable="top">
+          <field name="name" string="component-name"/>
+          <field name="category_id"/>
+          <field name="sequence" widget="handle"/>
+        </list>
+      </field>
+    </record>
+
+    <record id="view_component_form" model="ir.ui.view">
+      <field name="name">site.visit.template.component.form</field>
+      <field name="model">site.visit.template.component</field>
+      <field name="arch" type="xml">
+        <form string="Component">
+          <sheet>
+            <group>
+              <field name="name" string="component-name"/>
+              <field name="category_id"/>
+              <field name="sequence"/>
+            </group>
+            <field name="point_ids" context="{'default_view_mode': 'kanban'}"/>
+          </sheet>
+        </form>
+      </field>
+    </record>
+
+    <!-- ============================= -->
+    <!-- POINT VIEWS -->
+    <!-- ============================= -->
+
+    <record id="view_point_kanban" model="ir.ui.view">
+      <field name="name">site.visit.template.point.kanban</field>
+      <field name="model">site.visit.template.point</field>
+      <field name="arch" type="xml">
+        <kanban  default_group_by="component_id"  class="o_kanban_view" group_create="true" group_deletable="true" group_editable="true">
+          <field name="name" string="point-name"/>
+          <field name="component_id"/>
+          <field name="sequence"/>
+          <templates>
+            <t t-name="kanban-box">
+              <div class="oe_kanban_global_click o_kanban_card">
+                <strong><field name="name" string="point-name"/></strong><br/>
+                <field name="component_id"/>
+              </div>
+            </t>
+          </templates>
+        </kanban>
+      </field>
+    </record>
+
+    <record id="view_point_list" model="ir.ui.view">
+      <field name="name">site.visit.template.point.list</field>
+      <field name="model">site.visit.template.point</field>
+      <field name="arch" type="xml">
+        <list editable="top">
+          <field name="name" string="point-name"/>
+          <field name="component_id"/>
+          <field name="sequence" widget="handle"/>
+        </list>
+      </field>
+    </record>
+
+    <record id="view_point_form" model="ir.ui.view">
+      <field name="name">site.visit.template.point.form</field>
+      <field name="model">site.visit.template.point</field>
+      <field name="arch" type="xml">
+        <form string="Point">
+          <sheet>
+            <group>
+              <field name="name" string="point-name"/>
+              <field name="component_id"/>
+              <field name="sequence"/>
+            </group>
+          </sheet>
+        </form>
+      </field>
+    </record>
+
+  </data>
+</odoo>

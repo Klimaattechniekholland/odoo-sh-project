@@ -7,23 +7,19 @@
                 <form string="Refresh ACLs">
                     <group>
                         <field name="group_id"/>
+                        <field name="mode"/>
+                        <field name="preview_log" invisible="mode == 'apply'"/>
                     </group>
                     <footer>
-                        <button string="Refresh ACLs"
-                                type="object"
-                                name="refresh_acls"
-                                class="btn-primary"
-                                create="0"/>
-
-
-                        <button string="Cancel" class="btn-secondary" special="cancel"/>
+                        <button name="refresh_acls" type="object" string="Run" class="btn-primary" create="0"/>
+                        <button string="Cancel" special="cancel" class="btn-secondary"/>
                     </footer>
                 </form>
             </field>
         </record>
 
         <record id="action_acl_refresh_wizard" model="ir.actions.act_window">
-            <field name="name">Refresh ACLs</field>
+            <field name="name">ACL Refresh</field>
             <field name="res_model">site_visit.acl.refresh</field>
             <field name="view_mode">form</field>
             <field name="target">new</field>

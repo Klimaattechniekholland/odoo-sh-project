@@ -18,46 +18,52 @@
               parent="menu_site_visit_root"
               sequence="30"/>
 
+
+    <menuitem id="menu_site_visit_templates"
+              name="Manage Templates"
+              parent="menu_site_visit_configuration"
+              action="action_site_visit_template"
+              sequence="10"/>
+
     <!-- Submenu Categories -->
     <menuitem id="menu_site_visit_categories"
               name="Categories"
               parent="menu_site_visit_configuration"
-              action="action_site_visit"
-              sequence="10"/>
+              action="action_site_visit_categories"
+              sequence="20"/>
+    <!--              web_icon="fa-layer-group"/>-->
 
     <!-- Submenu Components -->
     <menuitem id="menu_site_visit_components"
               name="Components"
               parent="menu_site_visit_configuration"
-              action="action_site_inspection_component"
-              sequence="20"/>
+              action="action_site_visit_components"
+              sequence="30"/>
+    <!--              web_icon="fa-cogs"/>-->
 
     <!-- Submenu Points -->
     <menuitem id="menu_site_visit_points"
               name="Points"
               parent="menu_site_visit_configuration"
-              action="action_site_visit"
-              sequence="30"/>
+              action="action_site_visit_points"
+              sequence="40"/>
+    <!--              web_icon="fa-list-check"/>-->
 
 
+    <!-- Submenu Developer tools - with subs Refresh ACLs  -->
     <menuitem id="menu_site_visit_dev"
               name="Developer Tools"
               parent="menu_site_visit_root"
               groups="base.group_system"
-              sequence="100"/>
+              sequence="30"/>
 
-<!--    <menuitem id="menu_site_visit_acl_refresh"-->
-<!--              name="Refresh ACLs"-->
-<!--              parent="menu_site_visit_dev"-->
-<!--              action="action_refresh_site_visit_acls"-->
-<!--              groups="base.group_system"-->
-<!--              sequence="10"/>-->
-
+    <!-- Submenu Refresh ACLs  -->
     <menuitem id="menu_site_visit_acl_refresh"
-          name="Refresh ACLs"
-          parent="menu_site_visit_dev"
-          action="action_acl_refresh_wizard"
-          groups="base.group_system"
-          sequence="10"/>
+              name="Refresh ACLs"
+              parent="menu_site_visit_dev"
+              action="action_acl_refresh_wizard"
+              groups="base.group_system"
+              sequence="10"/>
+
 
 </odoo>

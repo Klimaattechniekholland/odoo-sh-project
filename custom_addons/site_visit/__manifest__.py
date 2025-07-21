@@ -27,6 +27,9 @@
 		'views/site_visit_inspection_component_views.xml',
 		'views/site_visit_inspection_point_views.xml',
 		
+		'views/site_visit_template.xml',
+		'views/site_visit_template_structure_views.xml',
+		'views/installation.xml',
 		
 		'views/site_visit_image_views.xml',
 		'views/site_visit_views.xml',

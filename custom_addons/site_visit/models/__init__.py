@@ -5,3 +5,11 @@ from . import site_visit_inspection_category
 from . import site_visit_inspection_component
 from . import site_visit_inspection_point
 from . import acl_refresh
+from . import site_visit_template
+from . import site_visit_template_category
+from . import site_visit_template_component
+from . import site_visit_template_point
+from . import site_visit_user_category
+from . import site_visit_user_component
+from . import site_visit_user_point
+from . import site_visit_installation

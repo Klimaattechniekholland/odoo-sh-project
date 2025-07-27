@@ -1,0 +1,9 @@
+<odoo>
+    <!-- Top-level Menu -->
+    <menuitem id="menu_site_visit_root"
+              name="Site Visits"
+              sequence="10"
+              web_icon="site_visit/static/description/icon64.png"/>
+
+
+</odoo>

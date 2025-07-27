@@ -1,0 +1,29 @@
+<odoo>
+    <data>
+
+        <!-- Submenu Developer tools - with subs Refresh ACLs  -->
+        <menuitem id="menu_site_visit_dev"
+                  name="Developer Tools"
+                  parent="menu_site_visit_root"
+                  groups="base.group_system"
+                  sequence="30"/>
+
+        <!-- Submenu Refresh ACLs  -->
+        <menuitem id="menu_site_visit_acl_refresh"
+                  name="Refresh ACLs"
+                  parent="menu_site_visit_dev"
+                  action="action_acl_refresh_wizard"
+                  groups="base.group_system"
+                  sequence="10"/>
+
+
+        <!-- Server Action to run the ACL refresh -->
+        <record id="action_refresh_site_visit_acls" model="ir.actions.server">
+            <field name="name">Refresh Site Visit ACLs</field>
+            <field name="model_id" ref="base.model_res_users"/>
+            <field name="state">code</field>
+            <field name="code">env['site_visit.acl.refresh'].refresh_acls()</field>
+        </record>
+
+    </data>
+</odoo>

@@ -1,0 +1,76 @@
+<!-- Configuration - template, with submenus Templates, Categories, Components, Points-->
+
+<odoo>
+    <data>
+        <!-- Configuration, with submenus Templates, Categories, Components, Points-->
+        <menuitem id="menu_site_visit_configuration"
+                  name="Configuration"
+                  parent="menu_site_visit_root"
+                  sequence="30"/>
+
+
+
+        <!--Submenu Menu Templates Action -->
+        <record id="action_site_visit_template" model="ir.actions.act_window">
+            <field name="name">Templates</field>
+            <field name="res_model">site.visit.template</field>
+            <field name="view_mode">list,form,kanban</field>
+        </record>
+
+        <!-- Submenu Templates -->
+        <menuitem id="menu_site_visit_templates"
+                  name="Templates"
+                  parent="menu_site_visit_configuration"
+                  action="action_site_visit_template"
+                  sequence="10"/>
+
+
+        <!-- Submenu Menu Category Action -->
+        <record id="action_site_visit_template_categories" model="ir.actions.act_window">
+            <field name="name">Categories</field>
+            <field name="res_model">site.visit.template.category</field>
+            <field name="view_mode">kanban,list,form</field>
+        </record>
+
+        <!-- Submenu Categories -->
+        <menuitem id="menu_site_visit_template_categories"
+                  name="Categories"
+                  parent="menu_site_visit_configuration"
+                  action="action_site_visit_template_categories"
+                  sequence="20"/>
+        <!--              web_icon="fa-layer-group"/>-->
+
+
+        <!-- Submenu Component action -->
+        <record id="action_site_visit_template_components" model="ir.actions.act_window">
+            <field name="name">Components</field>
+            <field name="res_model">site.visit.template.component</field>
+            <field name="view_mode">kanban,list,form</field>
+        </record>
+
+        <!-- Submenu Components -->
+        <menuitem id="menu_site_visit_template_components"
+                  name="Components"
+                  parent="menu_site_visit_configuration"
+                  action="action_site_visit_template_components"
+                  sequence="30"/>
+        <!--              web_icon="fa-cogs"/>-->
+
+        <!-- Submenu Point action-->
+        <record id="action_site_visit_template_points" model="ir.actions.act_window">
+            <field name="name">Points</field>
+            <field name="res_model">site.visit.template.point</field>
+            <field name="view_mode">kanban,list,form</field>
+        </record>
+
+        <!-- Submenu Points -->
+        <menuitem id="menu_site_visit_template_points"
+                  name="Points"
+                  parent="menu_site_visit_configuration"
+                  action="action_site_visit_template_points"
+                  sequence="40"/>
+        <!--              web_icon="fa-list-check"/>-->
+
+
+    </data>
+</odoo>

@@ -1,0 +1,59 @@
+<!-- SiteVisit, with submenus -->
+
+<odoo>
+    <data>
+        <!-- Site Visit Actions -->
+        <record id="action_site_visit" model="ir.actions.act_window">
+            <field name="name">Site Visits</field>
+            <field name="res_model">site.visit</field>
+            <field name="view_mode">list,form</field>
+        </record>
+
+        <!-- SiteVisit Menu -->
+        <menuitem id="menu_site_visit_visits"
+                  name="Visits"
+                  parent="menu_site_visit_root"
+                  action="action_site_visit"
+                  sequence="20"/>
+
+
+        <!-- Inspection Category Action -->
+        <record id="action_site_visit_category" model="ir.actions.act_window">
+            <field name="name">Inspection Categories</field>
+            <field name="res_model">site.visit.category</field>
+            <field name="view_mode">list,form</field>
+        </record>
+
+        <!-- Submenu Templates -->
+        <menuitem id="menu_site_visit_templates"
+                  name="Templates"
+                  parent="menu_site_visit_configuration"
+                  action="action_site_visit_template"
+                  sequence="10"/>
+
+
+        <!-- Inspection Component Action -->
+        <record id="action_site_visit_component" model="ir.actions.act_window">
+            <field name="name">Inspection Component</field>
+            <field name="res_model">site.visit.component</field>
+            <field name="view_mode">list,form</field>
+        </record>
+
+
+        <!-- Inspection points Action -->
+        <record id="action_site_visit_point" model="ir.actions.act_window">
+            <field name="name">Inspection Point</field>
+            <field name="res_model">site.visit.point</field>
+            <field name="view_mode">list,form</field>
+        </record>
+
+        <!-- Inspection point inputs Action -->
+        <record id="action_site_visit_point_input" model="ir.actions.act_window">
+            <field name="name">Inspection Point Input</field>
+            <field name="res_model">site.visit.point.input</field>
+            <field name="view_mode">list,form,kanban</field>
+        </record>
+
+    </data>
+</odoo>
+

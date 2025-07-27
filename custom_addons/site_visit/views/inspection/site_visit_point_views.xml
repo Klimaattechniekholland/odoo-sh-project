@@ -1,0 +1,112 @@
+<odoo>
+    <data>
+
+        <!-- ============================= -->
+        <!-- Kanban View -->
+        <!-- ============================= -->
+        <record id="view_inspection_point_input_kanban" model="ir.ui.view">
+            <field name="name">site.visit.point.input.kanban</field>
+            <field name="model">site.visit.point.input</field>
+            <field name="arch" type="xml">
+                <kanban>
+                    <field name="name"/>
+                    <field name="field_type"/>
+                    <field name="value_char"/>
+                    <field name="value_note"/>
+                    <field name="value_integer"/>
+                    <field name="value_float"/>
+                    <field name="value_image"/>
+                    <field name="value_bool"/>
+
+                    <templates>
+                        <t t-name="kanban-box">
+                            <div class="o_kanban_card">
+                                <div class="oe_kanban_details">
+                                    <strong><field name="name"/></strong>
+                                    <div t-if="record.field_type.raw_value == 'char'">
+                                        <i class="fa fa-font" title="Text"/>&#160;
+                                        <field name="value_char"/>
+                                    </div>
+                                    <div t-if="record.field_type.raw_value == 'text'">
+                                        <i class="fa fa-align-left" title="Multiline Text"/>&#160;
+                                        <field name="value_note"/>
+                                    </div>
+                                    <div t-if="record.field_type.raw_value == 'integer'">
+                                        <i class="fa fa-hashtag" title="Integer"/>&#160;
+                                        <field name="value_integer"/>
+                                    </div>
+                                    <div t-if="record.field_type.raw_value == 'float'">
+                                        <i class="fa fa-percent" title="Decimal"/>&#160;
+                                        <field name="value_float"/>
+                                    </div>
+                                    <div t-if="record.field_type.raw_value == 'bool'">
+                                        <i class="fa fa-check-square" title="Yes/No"/>&#160;
+                                        <field name="value_bool"/>
+                                    </div>
+                                    <div t-if="record.field_type.raw_value == 'image'">
+                                        <i class="fa fa-image" title="Image"/><br/>
+                                        <field name="value_image" widget="image" class="oe_avatar"/>
+                                    </div>
+                                </div>
+                            </div>
+                        </t>
+                    </templates>
+                </kanban>
+            </field>
+        </record>
+
+        <!-- ============================= -->
+        <!-- List View -->
+        <!-- ============================= -->
+        <record id="view_inspection_point_input_list" model="ir.ui.view">
+            <field name="name">site.visit.point.input.list</field>
+            <field name="model">site.visit.point.input</field>
+            <field name="arch" type="xml">
+                <list editable="bottom">
+                    <field name="name"/>
+                    <field name="field_type"/>
+                    <field name="value_char" invisible="field_type != 'char'"/>
+                    <field name="value_note" invisible="field_type != 'text'"/>
+                    <field name="value_integer" invisible="field_type != 'int'"/>
+                    <field name="value_float" invisible="field_type != 'float'"/>
+                    <field name="value_bool" invisible="field_type != 'bool'"/>
+                    <field name="value_image" widget="image" invisible="field_type != 'image'"/>
+                    <field name="display_value" readonly="1"/>
+                </list>
+            </field>
+        </record>
+
+
+        <record id="view_inspection_point_input_form" model="ir.ui.view">
+            <field name="name">site.visit.point.input.form</field>
+            <field name="model">site.visit.point.input</field>
+            <field name="arch" type="xml">
+                <form string="Inspection Input">
+                    <sheet>
+                        <group>
+                            <field name="point_id"/>
+                            <field name="name"/>
+                            <field name="field_type"/>
+                            <!--                            <field name="description"/>-->
+                        </group>
+
+                        <group string="Input Value">
+                            <field name="value_char" invisible="field_type != 'char'"/>
+                            <field name="value_note" invisible="field_type != 'text'"/>
+                    <field name="value_integer" invisible="field_type != 'int'"/>
+                            <field name="value_float" invisible="field_type != 'float'"/>
+                            <field name="value_bool" invisible="field_type != 'bool'"/>
+                            <field name="value_image" widget="image" invisible="field_type != 'image'"/>
+                        </group>
+                        <group>
+                            <field name="display_value" readonly="1"/>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+
+    </data>
+</odoo>
+

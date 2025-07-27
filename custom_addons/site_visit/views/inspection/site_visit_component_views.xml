@@ -1,8 +1,8 @@
 <odoo>
     <data>
-        <record id="view_form_site_visit_inspection_component" model="ir.ui.view">
-            <field name="name">site.visit.inspection.component.form</field>
-            <field name="model">site.visit.inspection.component</field>
+        <record id="view_form_site_visit_component" model="ir.ui.view">
+            <field name="name">site.visit.component.form</field>
+            <field name="model">site.visit.component</field>
             <field name="arch" type="xml">
                 <form string="Inspection Component">
                     <sheet>
@@ -15,9 +15,9 @@
             </field>
         </record>
 
-         <record id="view_list_site_visit_inspection_component" model="ir.ui.view">
-            <field name="name">site.visit.inspection.component.list</field>
-            <field name="model">site.visit.inspection.component</field>
+         <record id="view_list_site_visit_component" model="ir.ui.view">
+            <field name="name">site.visit.component.list</field>
+            <field name="model">site.visit.component</field>
             <field name="arch" type="xml">
                 <list>
                     <field name="name"/>

@@ -1,0 +1,21 @@
+<odoo>
+    <data>
+        <record id="view_site_visit_template_transient_point_wizard_form" model="ir.ui.view">
+            <field name="name">site.visit.template.transient.point.wizard.form</field>
+            <field name="model">site.visit.template.transient.point</field>
+            <field name="arch" type="xml">
+                <form string="Copy Point">
+                    <group>
+                        <field name="point_id" readonly="1"/>
+                        <field name="target_component_id"/>
+                        <field name="include_inputs"/>
+                    </group>
+                    <footer>
+                        <button name="action_copy_point" type="object" string="Copy" class="btn-primary"/>
+                        <button string="Cancel" special="cancel"/>
+                    </footer>
+                </form>
+            </field>
+        </record>
+    </data>
+</odoo>

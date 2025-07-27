@@ -1,0 +1,21 @@
+<odoo>
+    <data>
+        <record id="view_site_visit_template_transient_component_wizard_form" model="ir.ui.view">
+            <field name="name">site.visit.template.transient.component.wizard.form</field>
+            <field name="model">site.visit.template.transient.component</field>
+            <field name="arch" type="xml">
+                <form string="Copy Component">
+                    <group>
+                        <field name="component_id" readonly="1"/>
+                        <field name="target_category_id"/>
+                        <field name="include_points"/>
+                    </group>
+                    <footer>
+                        <button name="action_copy_component" type="object" string="Copy" class="btn-primary"/>
+                        <button string="Cancel" special="cancel"/>
+                    </footer>
+                </form>
+            </field>
+        </record>
+    </data>
+</odoo>

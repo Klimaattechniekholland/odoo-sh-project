@@ -15,8 +15,8 @@ class SiteVisitImage(models.Model):
     
     visit_id = fields.Many2one('site.visit', string='Site Visit', required=True, ondelete='cascade')
 
-    category_id = fields.Many2one('site.visit.inspection.category', string='Category')
-    component_id = fields.Many2one('site.visit.inspection.component', string='Component')
+    category_id = fields.Many2one('site.visit.category', string='Category')
+    component_id = fields.Many2one('site.visit.component', string='Component')
     point_ids = fields.One2many('site.visit.image.point', 'image_id', string='Sub-Points')
     
     image = fields.Binary(string='Photo', required=True, attachment=True)
@@ -25,7 +25,7 @@ class SiteVisitImage(models.Model):
     # @api.model
     # def create(self, vals):
     #     record = super().create(vals)
-    #     template_items = self.env['site.inspection.point.template'].search([
+    #     template_items = self.env['site.point.template'].search([
     #         ('category_id', '=', record.category_id.id),
     #         '|', ('component_id', '=', False), ('component_id', '=', record.component_id.id)
     #     ])

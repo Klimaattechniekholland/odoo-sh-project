@@ -1,0 +1,65 @@
+<odoo>
+    <data>
+
+        <record id="view_form_site_visit" model="ir.ui.view">
+            <field name="name">site.visit.form</field>
+            <field name="model">site.visit</field>
+            <field name="arch" type="xml">
+                <form string="Site Visit">
+                    <sheet>
+                        <group>
+                            <field name="name"/>
+                            <field name="customer_id"/>
+                            <field name="technician_id"/>
+                            <field name="visit_date"/>
+                            <field name="template_id"/>
+                            <button name="action_generate_inspection" type="object"
+                                    string="Load from Template" class="btn-primary"/>
+                        </group>
+
+                        <notebook>
+                            <page string="Inspection Categories">
+                                <field name="category_ids" readonly="1">
+                                    <form string="Category">
+                                        <sheet>
+                                            <group>
+                                                <field name="name" readonly="1"/>
+                                            </group>
+                                            <field name="component_ids" readonly="1">
+                                                <form string="Component">
+                                                    <sheet>
+                                                        <group>
+                                                            <field name="name" readonly="1"/>
+                                                        </group>
+                                                        <field name="point_ids" mode="kanban"
+                                                               options="{'kanban_view_ref': 'site_visit.view_site_visit_point_kanban'}"/>
+
+                                                    </sheet>
+                                                </form>
+                                            </field>
+                                        </sheet>
+                                    </form>
+                                </field>
+                            </page>
+
+                            <page string="Images">
+                                <field name="image_ids">
+                                    <form string="Image">
+                                        <sheet>
+                                            <group>
+                                                <field name="category_id"/>
+                                                <field name="image" widget="image"/>
+                                                <field name="note"/>
+                                            </group>
+                                        </sheet>
+                                    </form>
+                                </field>
+                            </page>
+                        </notebook>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+    </data>
+</odoo>

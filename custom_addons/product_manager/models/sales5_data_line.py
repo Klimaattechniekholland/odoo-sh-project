@@ -1,9 +1,9 @@
 from odoo import models, fields
 
 
-class Sales5Data(models.Model):
-	_name = 'sales5.data'
-	_description = 'Sales5 Sales Order Record'
+class Sales5LineData(models.Model):
+	_name = 'sales5.line.data'
+	_description = 'Sales5 Sales Order Record line item'
 	
 	order_id = fields.Char(string = "Order Reference", required = True)
 	order_date = fields.Date(string = "Order Date")
@@ -33,4 +33,4 @@ class Sales5Data(models.Model):
 			], string = "Order Status", default = "draft"
 		)
 	
-	line_ids = fields.One2many('sales5.data.line', 'sales5_id', string = "Order Lines")
+	sales5_ids = fields.Many2one('sales5.data', 'sales5_id')

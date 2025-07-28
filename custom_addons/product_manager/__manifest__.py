@@ -1,7 +1,7 @@
 {
-	'name': 'artikel_beheer',
+	'name': 'product_manager',
 	'version': '1.0.0',
-	'summary': 'Integrate Odoo with ArtikelBeheer',
+	'summary': 'Integrate Odoo with product management',
 	'category': 'Tools',
 	'author': 'Pi-Con',
 	'website': 'https://www.pi-con.nl',
@@ -9,6 +9,7 @@
 		'base',
 		'base_setup',
 		'contacts',
+		'product'
 		],
 	
 	# 'post_init_hook': 'setup_bag_access_rights',

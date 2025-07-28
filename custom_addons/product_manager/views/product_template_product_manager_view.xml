@@ -1,0 +1,32 @@
+<odoo>
+    <data>
+        <record id="view_product_manager_items" model="ir.ui.view">
+            <field name="name">product.manager.form</field>
+            <field name="model">product.product</field>
+            <field name="inherit_id" ref="product.product_template_form_view"/>
+            <field name="arch" type="xml">
+
+                <!-- Add to the main address section (main contact) -->
+                <xpath expr="//group[@name='group_standard_price']" position="after">
+                    <group>
+                        <label for="zip" string="Zip + Number"/>
+
+                        <div class="o_address_format" name="div_address_zip">
+
+                            <field name="zip"
+                                   placeholder="ZIP"
+                                   class="o_address_zip"
+                                   readonly="type == 'contact' and parent_id"/>
+                            <field name="full_house_number"
+                                   placeholder="Number"
+                                   class="o_address_city"
+                                   readonly="type == 'contact' and parent_id"/>
+                        </div>
+                    </group>
+
+                </xpath>
+
+            </field>
+        </record>
+    </data>
+</odoo>

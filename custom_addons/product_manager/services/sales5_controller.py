@@ -1,4 +1,5 @@
 from odoo import http
+from odoo.addons.product_manager.utils import token_required
 from odoo.http import request
 
 

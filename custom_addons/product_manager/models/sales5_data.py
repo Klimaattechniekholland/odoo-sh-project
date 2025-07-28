@@ -33,4 +33,4 @@ class Sales5Data(models.Model):
 			], string = "Order Status", default = "draft"
 		)
 	
-	line_ids = fields.One2many('sales5.data.line', 'sales5_id', string = "Order Lines")
+	# line_ids = fields.One2many('sales5.line.data', 'line_ids', string = "Order Lines")

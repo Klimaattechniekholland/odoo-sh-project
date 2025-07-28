@@ -20,3 +20,4 @@ from . import site_visit_template_transient_component
 from . import site_visit_template_transient_point
 from . import site_visit_template_transient_input
 
+from . import site_visit_breadcrumb_mixin

@@ -1,9 +1,9 @@
 # models.py
 from odoo import api, fields, models
-from .site_visit_breadcrumb_mixin import BreadcrumbMixin
+from .site_visit_breadcrumb_mixin import SiteVisitBreadcrumbMixin
 
 
-class TemplateCategory(models.Model, BreadcrumbMixin):
+class TemplateCategory(models.Model, SiteVisitBreadcrumbMixin):
 	_name = 'site.visit.template.category'
 	_description = 'Template Category'
 	_order = 'sequence, name'
@@ -11,17 +11,14 @@ class TemplateCategory(models.Model, BreadcrumbMixin):
 	template_id = fields.Many2one('site.visit.template', required = True, ondelete = 'cascade')
 	component_ids = fields.One2many('site.visit.template.component', 'category_id', string = "Components")
 	
-	name = fields.Char(required = True)
+	name = fields.Char( default = "!! Please Rename Category !!", required = True)
 	sequence = fields.Integer(string = "Sequence", default = 1)
 	display_code = fields.Char(string = "Code", compute = "_compute_display_code", store = True)
-	breadcrumb_html = fields.Html(string = "Breadcrumb", compute = "_compute_breadcrumb_html")
-	
 	
 	def _get_breadcrumb_chain(self):
 		return [
 			("template_id", "name"),
 			]
-	
 	
 	@api.depends('template_id.name', 'name')
 	def _compute_breadcrumb_html(self):

@@ -1,8 +1,8 @@
 from odoo import api, fields, models
-from .site_visit_breadcrumb_mixin import BreadcrumbMixin
+from .site_visit_breadcrumb_mixin import SiteVisitBreadcrumbMixin
 
 
-class SiteVisitTemplateInput(models.Model, BreadcrumbMixin):
+class SiteVisitTemplateInput(models.Model, SiteVisitBreadcrumbMixin):
 	_name = 'site.visit.template.input'
 	_description = 'Template Input Definition'
 	_order = 'sequence, name'
@@ -14,7 +14,7 @@ class SiteVisitTemplateInput(models.Model, BreadcrumbMixin):
 		ondelete = 'cascade'
 		)
 	
-	name = fields.Char(string = "Label", required = True)
+	name = fields.Char(string = "Label", default = "!! Please Rename Input !!", required = True)
 	description = fields.Char(string = "Description", required = True)
 	display_code = fields.Char(string = "Code", compute = "_compute_display_code", store = True)
 	sequence = fields.Integer(string = "Sequence", default = 1)
@@ -29,9 +29,7 @@ class SiteVisitTemplateInput(models.Model, BreadcrumbMixin):
 			('text', 'Note'),
 			], string = "Field Type", required = True
 		)
-	
-	breadcrumb_html = fields.Html(string = "Breadcrumb", compute = "_compute_breadcrumb_html")
-	
+		
 	
 	def _get_breadcrumb_chain(self):
 		return [

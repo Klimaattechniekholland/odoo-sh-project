@@ -1,9 +1,9 @@
 # models.py
 from odoo import api, fields, models
-from .site_visit_breadcrumb_mixin import BreadcrumbMixin
+from .site_visit_breadcrumb_mixin import SiteVisitBreadcrumbMixin
 
 
-class TemplateComponent(models.Model, BreadcrumbMixin):
+class TemplateComponent(models.Model, SiteVisitBreadcrumbMixin):
 	_name = 'site.visit.template.component'
 	_description = 'Template Component'
 	_order = 'sequence, name'
@@ -13,10 +13,9 @@ class TemplateComponent(models.Model, BreadcrumbMixin):
 		)
 	point_ids = fields.One2many('site.visit.template.point', 'component_id', string = "Points")
 	
-	name = fields.Char(required = True)
+	name = fields.Char(required = True, default = "!! Please Rename Component !!")
 	sequence = fields.Integer(string = "Sequence", default = 1)
 	display_code = fields.Char(string = "Code", compute = "_compute_display_code", store = True)
-	breadcrumb_html = fields.Html(string = "Breadcrumb", compute = "_compute_breadcrumb_html")
 	
 	
 	def _get_breadcrumb_chain(self):

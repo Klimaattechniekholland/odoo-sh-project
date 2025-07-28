@@ -1,16 +1,18 @@
 # models.py
 from odoo import api, fields, models
+from .site_visit_breadcrumb_mixin import SiteVisitBreadcrumbMixin
 
 
-class TemplatePoint(models.Model):
+class TemplatePoint(models.Model, SiteVisitBreadcrumbMixin):
 	_name = 'site.visit.template.point'
+	_inherit = ["site.visit.breadcrumb.mixin"]
 	_description = 'Template Point'
 	_order = 'sequence, name'
 	
 	component_id = fields.Many2one('site.visit.template.component', required = True, ondelete = 'cascade')
 	input_ids = fields.One2many('site.visit.template.input', 'point_id', string = 'Inputs')
 	
-	name = fields.Char(required = True)
+	name = fields.Char(required = True, default = "!! Please Rename Point !!")
 	sequence = fields.Integer(string = "Sequence", default = 1)
 	display_code = fields.Char(string = "Code", compute = "_compute_display_code", store = True)
 	
@@ -20,22 +22,20 @@ class TemplatePoint(models.Model):
 		store = True
 		)
 	
-	breadcrumb_html = fields.Html(string = "Breadcrumb", compute = "_compute_breadcrumb_html")
+	
+	def _get_breadcrumb_chain(self):
+		return [
+			("component_id", "name"),
+			("category_id", "name"),
+			("template_id", "name"),
+			]
+	
 	
 	@api.depends(
 		'component_id.name', 'component_id.category_id.name', 'component_id.category_id.template_id.name', 'name'
 		)
 	def _compute_breadcrumb_html(self):
-		for rec in self:
-			comp = rec.component_id
-			cat = comp.category_id
-			tmpl = cat.template_id
-			rec.breadcrumb_html = (
-				f'<a href="#" class="o_breadcrumb_link" data-model="site.visit.template" data-id="{tmpl.id}">{tmpl.name}</a>'
-				f' &raquo; <a href="#" class="o_breadcrumb_link" data-model="site.visit.template.category" data-id="{cat.id}">{cat.name}</a>'
-				f' &raquo; <a href="#" class="o_breadcrumb_link" data-model="site.visit.template.component" data-id="{comp.id}">{comp.name}</a>'
-				f' &raquo; <a href="#" class="o_breadcrumb_link" data-model="site.visit.template.point" data-id="{rec.id}">{rec.name}</a>'
-			)
+		super()._compute_breadcrumb_html()
 	
 	
 	def open_point(self):

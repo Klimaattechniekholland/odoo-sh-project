@@ -51,7 +51,7 @@
 	"assets": {
 		"web.assets_backend": [
 			"site_visit/static/src/css/site_visit_styles.css",
-			"site_visit/static/src/breadcrumb.js"
+			# "site_visit/static/src/breadcrumb.js"
 			],
 		},
 	

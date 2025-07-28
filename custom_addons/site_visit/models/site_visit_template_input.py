@@ -1,7 +1,8 @@
 from odoo import api, fields, models
+from .site_visit_breadcrumb_mixin import BreadcrumbMixin
 
 
-class SiteVisitTemplateInput(models.Model):
+class SiteVisitTemplateInput(models.Model, BreadcrumbMixin):
 	_name = 'site.visit.template.input'
 	_description = 'Template Input Definition'
 	_order = 'sequence, name'
@@ -29,7 +30,16 @@ class SiteVisitTemplateInput(models.Model):
 			], string = "Field Type", required = True
 		)
 	
-	breadcrumb_html = fields.Html(string = "Breadcrumb", compute = "_compute_breadcrumb_html", store = True)
+	breadcrumb_html = fields.Html(string = "Breadcrumb", compute = "_compute_breadcrumb_html")
+	
+	
+	def _get_breadcrumb_chain(self):
+		return [
+			("point_id", "name"),
+			("component_id", "name"),
+			("category_id", "name"),
+			("template_id", "name"),
+			]
 	
 	
 	@api.depends(
@@ -37,18 +47,7 @@ class SiteVisitTemplateInput(models.Model):
 		'point_id.component_id.category_id.template_id.name', 'name'
 		)
 	def _compute_breadcrumb_html(self):
-		for rec in self:
-			point = rec.point_id
-			comp = point.component_id
-			cat = comp.category_id
-			tmpl = cat.template_id
-			rec.breadcrumb_html = (
-				f'<a href="#" class="o_breadcrumb_link" data-model="site.visit.template" data-id="{tmpl.id}">{tmpl.name}</a>'
-				f' &raquo; <a href="#" class="o_breadcrumb_link" data-model="site.visit.template.category" data-id="{cat.id}">{cat.name}</a>'
-				f' &raquo; <a href="#" class="o_breadcrumb_link" data-model="site.visit.template.component" data-id="{comp.id}">{comp.name}</a>'
-				f' &raquo; <a href="#" class="o_breadcrumb_link" data-model="site.visit.template.point" data-id="{point.id}">{point.name}</a>'
-				f' &raquo; <a href="#" class="o_breadcrumb_link" data-model="site.visit.template.input" data-id="{rec.id}">{rec.name}</a>'
-			)
+		super()._compute_breadcrumb_html()
 	
 	
 	def open_input(self):

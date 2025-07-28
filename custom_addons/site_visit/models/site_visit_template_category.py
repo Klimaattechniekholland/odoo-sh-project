@@ -1,8 +1,9 @@
 # models.py
 from odoo import api, fields, models
+from .site_visit_breadcrumb_mixin import BreadcrumbMixin
 
 
-class TemplateCategory(models.Model):
+class TemplateCategory(models.Model, BreadcrumbMixin):
 	_name = 'site.visit.template.category'
 	_description = 'Template Category'
 	_order = 'sequence, name'
@@ -13,19 +14,18 @@ class TemplateCategory(models.Model):
 	name = fields.Char(required = True)
 	sequence = fields.Integer(string = "Sequence", default = 1)
 	display_code = fields.Char(string = "Code", compute = "_compute_display_code", store = True)
-	breadcrumb_html = fields.Html(string = "Breadcrumb", compute = "_compute_breadcrumb_html", store = True)
+	breadcrumb_html = fields.Html(string = "Breadcrumb", compute = "_compute_breadcrumb_html")
+	
+	
+	def _get_breadcrumb_chain(self):
+		return [
+			("template_id", "name"),
+			]
 	
 	
 	@api.depends('template_id.name', 'name')
 	def _compute_breadcrumb_html(self):
-		for rec in self:
-			tmpl = rec.template_id
-			
-	
-			rec.breadcrumb_html = (
-				f'<a href="#" class="o_breadcrumb_link" data-odoo-model="site.visit.template" data-id="{tmpl.id}">{tmpl.name}</a>'
-				f' &raquo; <a href="#" class="o_breadcrumb_link" data-odoo-model="site.visit.template.category" data-id="{rec.id}">{rec.name}</a>'
-			)
+		super()._compute_breadcrumb_html()
 	
 	
 	def open_category(self):

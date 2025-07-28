@@ -1,8 +1,9 @@
 # models.py
 from odoo import api, fields, models
+from .site_visit_breadcrumb_mixin import BreadcrumbMixin
 
 
-class TemplateComponent(models.Model):
+class TemplateComponent(models.Model, BreadcrumbMixin):
 	_name = 'site.visit.template.component'
 	_description = 'Template Component'
 	_order = 'sequence, name'
@@ -15,18 +16,18 @@ class TemplateComponent(models.Model):
 	name = fields.Char(required = True)
 	sequence = fields.Integer(string = "Sequence", default = 1)
 	display_code = fields.Char(string = "Code", compute = "_compute_display_code", store = True)
-	breadcrumb_html = fields.Html(string = "Breadcrumb", compute = "_compute_breadcrumb_html", store = True)
+	breadcrumb_html = fields.Html(string = "Breadcrumb", compute = "_compute_breadcrumb_html")
+	
+	
+	def _get_breadcrumb_chain(self):
+		return [
+			("category_id", "name"),
+			("template_id", "name"),
+			]
 	
 	
 	def _compute_breadcrumb_html(self):
-		for rec in self:
-			template = rec.category_id.template_id
-			category = rec.category_id
-			rec.breadcrumb_html = (
-				f'<a href="#" class="o_breadcrumb_link" data-model="site.visit.template" data-id="{template.id}">{template.name}</a>'
-				f' &raquo; <a href="#" class="o_breadcrumb_link" data-model="site.visit.template.category" data-id="{category.id}">{category.name}</a>'
-				f' &raquo; <a href="#" class="o_breadcrumb_link" data-model="site.visit.template.component" data-id="{rec.id}">{rec.name}</a>'
-			)
+		super()._compute_breadcrumb_html()
 	
 	
 	def open_component(self):

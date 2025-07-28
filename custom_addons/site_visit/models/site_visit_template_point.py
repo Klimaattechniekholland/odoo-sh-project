@@ -20,8 +20,7 @@ class TemplatePoint(models.Model):
 		store = True
 		)
 	
-	breadcrumb_html = fields.Html(string = "Breadcrumb", compute = "_compute_breadcrumb_html", store = True)
-	
+	breadcrumb_html = fields.Html(string = "Breadcrumb", compute = "_compute_breadcrumb_html")
 	
 	@api.depends(
 		'component_id.name', 'component_id.category_id.name', 'component_id.category_id.template_id.name', 'name'

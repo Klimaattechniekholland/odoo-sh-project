@@ -5,7 +5,7 @@ class ProductManager(models.Model):
 	_name = 'product.manager'
 	_description = 'Product Manager'
 	
-	# _inherit = ['product.template']
+	_inherit = ['product.template']
 	
 	_in_onchange = False  # Guard-flag for loops in onchange calls
 	
@@ -19,7 +19,7 @@ class ProductManager(models.Model):
 
 	
 	# Link to a specific product variant
-	product_manager_id = fields.Many2one('product.product', string = "Product", required = True)
+	product_manager_id = fields.Many2one('product.template', string = "Product", required = True)
 
 	#
 	# sales price => product_id.list_price

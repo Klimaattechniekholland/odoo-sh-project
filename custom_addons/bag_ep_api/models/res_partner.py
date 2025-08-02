@@ -83,6 +83,7 @@ class ResPartner(models.Model):
 	def create(self, vals_list):
 		partners = super().create(vals_list)
 		for partner in partners:
+			warnings = []
 			
 			fetched_data, warnings = ResolverManager(self).resolve_all(warnings)
 			parsed = None
@@ -104,7 +105,7 @@ class ResPartner(models.Model):
 		result = super().write(vals)
 		
 		for partner in self:
-			
+			warnings = []
 			parsed, warnings = ResolverManager(self).resolve_all(warnings)
 			
 			if parsed and not partner.parent_id:

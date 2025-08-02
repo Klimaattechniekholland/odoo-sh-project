@@ -1,5 +1,5 @@
 {
-	'name': 'product_manager',
+	'name': 'product_pricing',
 	'version': '1.0.0',
 	'summary': 'Integrate Odoo with product management',
 	'category': 'Tools',
@@ -13,12 +13,12 @@
 		],
 	
 	'data': [
-	
+		'views/product_template_product_pricing_view.xml',
 		],
 		
 	'installable': True,
 	'application': True,
-	'auto_install': True,
+	'auto_install': False,
 	
 	'license': 'LGPL-3'
 	}

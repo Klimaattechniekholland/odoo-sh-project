@@ -1,11 +1,9 @@
 from odoo import api, fields, models
 
 
-class ProductManager(models.Model):
-	_name = 'product.manager'
-	_description = 'Product Manager'
-	
-	_inherit = ['product.template']
+class ProductPricing(models.Model):
+	_name = 'product.pricing'
+	_description = 'Product Pricing'
 	
 	_in_onchange = False  # Guard-flag for loops in onchange calls
 	
@@ -15,11 +13,8 @@ class ProductManager(models.Model):
 	# product_short_name = fields.Char('Product Short Name')
 	# product_ean_code = fields.Char('Product EAN Code')
 
-
-
-	
 	# Link to a specific product variant
-	product_manager_id = fields.Many2one('product.template', string = "Product", required = True)
+	product_pricing_id = fields.Many2one('product.template', string = "Product", required = True)
 
 	#
 	# sales price => product_id.list_price
@@ -69,21 +64,21 @@ class ProductManager(models.Model):
 	def _compute_discount(self):
 		for record in self:
 			if record.product_supplier_sales_price > 0:
-				discount = 1 - (self.product_manager_id.standard_price / self.product_supplier_sales_price)
+				discount = 1 - (self.product_pricing_id.standard_price / self.product_supplier_sales_price)
 				record.product_supplier_discount = round(discount, 2)
 	
 	
 	
 	def _compute_cost_price(self):
 		for record in self:
-			record.product_manager_id.standard_price = self.product_supplier_sales_price * (1 - self.product_supplier_discount)
+			record.product_pricing_id.standard_price = self.product_supplier_sales_price * (1 - self.product_supplier_discount)
 	
 	
 	# we don't recalculate the product supplier sales price, that is normally fixed, just to be complete
 	def _compute_supplier_sales_price(self):
 		for record in self:
 			if record.product_supplier_discount > 0:
-				record.product_supplier_sales_price = self.product_manager_id.standard_price / (1 - self.product_supplier_discount)
+				record.product_supplier_sales_price = self.product_pricing_id.standard_price / (1 - self.product_supplier_discount)
 
 	
 	#
@@ -103,30 +98,30 @@ class ProductManager(models.Model):
 		for record in self:
 			if self.product_use_margin:
 				if 0 < self.product_margin < 1:
-					record.product_manager_id.list_price = record.product_manager_id.standard_price / (1 - self.product_margin)
+					record.product_pricing_id.list_price = record.product_pricing_id.standard_price / (1 - self.product_margin)
 			else:
 				if 0 < self.product_markup < 1:
-					record.product_manager_id.list_price = record.product_manager_id.standard_price * (1 * self.product_markup)
+					record.product_pricing_id.list_price = record.product_pricing_id.standard_price * (1 * self.product_markup)
 
 
 	def _compute_percentage(self):
 		for record in self:
-			amount = (record.product_manager_id.list_price - record.product_manager_id.standard_price)
+			amount = (record.product_pricing_id.list_price - record.product_pricing_id.standard_price)
 			if amount > 0 :
 				if self.product_use_margin:
-					if record.product_manager_id.list_price > 0:
-						record.product_margin = amount / record.product_manager_id.list_price
+					if record.product_pricing_id.list_price > 0:
+						record.product_margin = amount / record.product_pricing_id.list_price
 				else:
-					if record.product_manager_id.standard_price > 0:
-						record.product_markup = amount / record.product_manager_id.standard_price
+					if record.product_pricing_id.standard_price > 0:
+						record.product_markup = amount / record.product_pricing_id.standard_price
 			
 				
 	def _compute_costqqq_price(self):
 		for record in self:
 			if self.product_supplier_sales_price:
-				record.product_manager_id.standard_price = record.product_manager_id.list_price / (1 - self.product_margin)
+				record.product_pricing_id.standard_price = record.product_pricing_id.list_price / (1 - self.product_margin)
 			else:
-				record.product_manager_id.standard_price = record.product_manager_id.list_price * (1 * self.product_markup)
+				record.product_pricing_id.standard_price = record.product_pricing_id.list_price * (1 * self.product_markup)
 
 
 	# === Onchange ===#
@@ -150,7 +145,7 @@ class ProductManager(models.Model):
 	# change Cost (standard_price) ==>
 	#     change the product_supplier_discount
 	#     change the Sale price (list_price)
-	@api.depends('product_manager_id.standard_price')
+	@api.depends('product_pricing_id.standard_price')
 	def _onchange_cost_price(self):
 		if self._in_onchange:
 			return
@@ -177,7 +172,7 @@ class ProductManager(models.Model):
 		
 	# change Sale price (list_price) ==>
 	#     change the product_supplier_discount
-	@api.depends('product_manager_id.list_price')
+	@api.depends('product_pricing_id.list_price')
 	def _onchange_sales_price(self):
 		if self._in_onchange:
 			return

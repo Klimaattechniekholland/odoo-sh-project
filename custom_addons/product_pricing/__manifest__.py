@@ -12,10 +12,14 @@
 		'product'
 		],
 	
+	'post_init_hook': 'setup_access_rights',
+
 	'data': [
-		'views/product_template_product_pricing_view.xml',
-		],
 		
+		'views/product_template_product_pricing_view.xml',
+		
+		],
+	
 	'installable': True,
 	'application': True,
 	'auto_install': False,

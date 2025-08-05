@@ -1,208 +1,155 @@
 from odoo import api, fields, models
 
 
-class ProductPricing(models.Model):
-	_name = 'product.pricing'
-	_description = 'Product Pricing'
+class ProductTemplate(models.Model):
+	_inherit = 'product.template'
 	
-	_in_onchange = False  # Guard-flag for loops in onchange calls
-	
-	# type_product = fields.Char('Type')
-	# brand_product = fields.Char('Brand')
-	# product_code = fields.Char('Product Code')
-	# product_short_name = fields.Char('Product Short Name')
-	# product_ean_code = fields.Char('Product EAN Code')
-
-	# Link to a specific product variant
-	product_pricing_id = fields.Many2one('product.template', string = "Product", required = True)
-
 	#
 	# sales price => product_id.list_price
 	# cost price => product_id.standard_price
 	#
-
-	
-	product_supplier_sales_price = fields.Float(
-		string = "Supplier sales Price",
-		digits = "Product Price",
-		help = "Price of the supplier - manufacturer without our discount, "
-		)
-	
-	
-	product_supplier_discount = fields.Float(
-		string = "Discount %",
-		digits = "Product Price",
-		help = "Buying Price of the supplier - manufacturer "
-		)
-	
-	product_margin = fields.Float(
-		string = "Margin %",
-		digits = "Product Price",
-		help = "Margin % we want to earn "
-		)
-	
-	product_markup = fields.Float(
-		string = "markup %",
-		digits = "Product Price",
-		help = "Markup % owe want, (not the price list value) "
-		)
-	
-	product_use_margin = fields.Boolean(
-		string = "use Margin",
-		help = "Use Margin or Markup ",
-		default = True
-		)
-	
-	
+	# Calculate the cost price with our Discount
+	# Cost = Sales price  * (1 - Discount)	#
 	#
-	# Calculate the cost price with our discount
-	# Cost = Sales price  * (1 - Discount)
-	# the cost price is also calculated with some price list on the supplier or with extra discounts
-	# we need to refactor probably this , todo
-	#
-	
-	def _compute_discount(self):
-		for record in self:
-			if record.product_supplier_sales_price > 0:
-				discount = 1 - (self.product_pricing_id.standard_price / self.product_supplier_sales_price)
-				record.product_supplier_discount = round(discount, 2)
-	
-	
-	
-	def _compute_cost_price(self):
-		for record in self:
-			record.product_pricing_id.standard_price = self.product_supplier_sales_price * (1 - self.product_supplier_discount)
-	
-	
-	# we don't recalculate the product supplier sales price, that is normally fixed, just to be complete
-	def _compute_supplier_sales_price(self):
-		for record in self:
-			if record.product_supplier_discount > 0:
-				record.product_supplier_sales_price = self.product_pricing_id.standard_price / (1 - self.product_supplier_discount)
-
-	
-	#
-	# we normally calculate with margins not with markup's
-	# markups are used in the odoo's price list!!! not very handy
+	# We normally calculate with mMargins not with Markup's
 	# Margin = (SellingPrice - Cost) / SellingPrice
 	# Markup = (Selling Price - Cost) / Cost
 	# for the same amount of money, the markup is always higher
-	# Margin 25%, Markup 33,333% gives the same earnings
+	# Margin 25%, Markup 33,333% gives the same earnings, default settings
 	#
-	# sales price => list_price
-	# cost price => standard_price
-	#
-	
-	
-	def _compute_sales_price(self):
-		for record in self:
-			if self.product_use_margin:
-				if 0 < self.product_margin < 1:
-					record.product_pricing_id.list_price = record.product_pricing_id.standard_price / (1 - self.product_margin)
-			else:
-				if 0 < self.product_markup < 1:
-					record.product_pricing_id.list_price = record.product_pricing_id.standard_price * (1 * self.product_markup)
-
-
-	def _compute_percentage(self):
-		for record in self:
-			amount = (record.product_pricing_id.list_price - record.product_pricing_id.standard_price)
-			if amount > 0 :
-				if self.product_use_margin:
-					if record.product_pricing_id.list_price > 0:
-						record.product_margin = amount / record.product_pricing_id.list_price
-				else:
-					if record.product_pricing_id.standard_price > 0:
-						record.product_markup = amount / record.product_pricing_id.standard_price
-			
-				
-	def _compute_costqqq_price(self):
-		for record in self:
-			if self.product_supplier_sales_price:
-				record.product_pricing_id.standard_price = record.product_pricing_id.list_price / (1 - self.product_margin)
-			else:
-				record.product_pricing_id.standard_price = record.product_pricing_id.list_price * (1 * self.product_markup)
-
-
-	# === Onchange ===#
-	
 	# top-down
 	# change product_supplier_sale_price or product_supplier_discount ==>
 	#     change the Cost (standard_price)
 	#     change the Sale price (list_price)
-	@api.depends('product_supplier_sales_price', 'product_supplier_discount')
-	def _onchange_supplier_price_discount(self):
-		if self._in_onchange:
-			return
-		try:
-			self._in_onchange = True
-			self._compute_cost_price()
-			self._compute_sales_price()
-		finally:
-			self._in_onchange = False
-
-
+	#
 	# change Cost (standard_price) ==>
 	#     change the product_supplier_discount
 	#     change the Sale price (list_price)
-	@api.depends('product_pricing_id.standard_price')
-	def _onchange_cost_price(self):
-		if self._in_onchange:
-			return
-		try:
-			self._in_onchange = True
-			self._compute_discount()
-			self._compute_sales_price()
-		finally:
-			self._in_onchange = False
-	
-	
+	#
 	# change product_use_margin or product_margin or product_markup==>
 	#     change the Sale price (list_price)
-	@api.depends('product_markup', 'product_margin', 'product_use_margin')
-	def _onchange_product_percentage(self):
-		if self._in_onchange:
-			return
-		try:
-			self._in_onchange = True
-			self._compute_sales_price()
-		finally:
-			self._in_onchange = False
-		
-		
+	#
 	# change Sale price (list_price) ==>
-	#     change the product_supplier_discount
-	@api.depends('product_pricing_id.list_price')
-	def _onchange_sales_price(self):
-		if self._in_onchange:
-			return
-		try:
-			self._in_onchange = True
-			self._compute_percentage()
-		finally:
-			self._in_onchange = False
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+	#     change the margin or markup
+	
+	supplier_sales_price = fields.Float(
+		string = "Supplier Sales Price",
+		digits = "Product Price",
+		help = "Base price from the supplier before discount"
+		)
+	
+	supplier_discount = fields.Float(
+		string = "Discount %",
+		digits = "Product Price",
+		help = "Discount from supplier, e.g. 0.15 = 15%"
+		)
+	
+	price_type = fields.Selection(
+		[
+			('margin', 'Margin'),
+			('markup', 'Markup')
+			],
+		string = "Use",
+		default = 'margin',
+		required = True,
+		help = "Toggle between Margin and Markup strategy"
+		)
+	
+	is_price_type = fields.Boolean(
+		string = "Result",
+		compute = "_get_price_type",
+		store = False
+		)
+	
+	margin = fields.Float(
+		string = "Margin %",
+		defalut = 25.0,
+		digits = "Product Price",
+		help = "Margin over cost to calculate selling price"
+		)
+	
+	markup = fields.Float(
+		string = "Markup %",
+		defalut = 33.33,
+		digits = "Product Price",
+		help = "Markup over cost to calculate selling price"
+		)
+	
+	
+	# === Radio button ==+ #
+	
+	@api.depends('price_type')
+	def _get_price_type(self):
+		for rec in self:
+			selection = dict(rec._fields['price_type'].selection)
+			rec.is_price_type = (selection.get(rec.price_type, '') == 'Margin')
+	
+	
+	# === Onchange Logic === #
+	
+	@api.onchange('supplier_sales_price', 'supplier_discount')
+	def _onchange_supplier_price_discount(self):
+		for rec in self:
+			if rec.supplier_sales_price:
+				# Compute cost
+				rec.standard_price = rec.supplier_sales_price * (1 - rec.supplier_discount / 100.0 or 0)
+				# Recompute sale price
+				rec._compute_sale_price()
+	
+	
+	@api.onchange('standard_price')
+	def _onchange_cost_price(self):
+		for rec in self:
+			if rec.supplier_sales_price:
+				discount = 1 - (rec.standard_price / rec.supplier_sales_price)
+				rec.supplier_discount = round(discount * 100, 2)
+			rec._compute_sale_price()
+	
+	
+	@api.onchange('price_type', 'margin', 'markup')
+	def _onchange_pricing_strategy(self):
+		self._compute_sale_price(True)
+	
+	
+	@api.onchange('list_price')
+	def _onchange_manual_sale_price(self):
+		for rec in self:
+			diff = rec.list_price - rec.standard_price
+			
+			if rec.is_price_type and rec.list_price:
+				rec.margin = round((diff / rec.list_price) * 100, 2)
+			
+			if not rec.is_price_type and rec.standard_price:
+				rec.markup = round(diff / rec.standard_price * 100, 2)
+			
+			
+			result = {}
+			if rec.is_price_type and rec.margin < 20:
+				result['warning'] = {
+					'title': " -- Warning Margin - - ",
+					'message': f"MARGIN is below 25%, it is now: {rec.margin} %. change it if not intended",
+					}
+			if not rec.is_price_type and rec.markup < 20:
+				result['warning'] = {
+					'title': " -- Warning Markup - - ",
+					'message': f"MARKUP is below 33.33%, it is now: {rec.markup} %. change it if not intended",
+					}
+			
+			return result or None
+		return None
+	
+	
+	def _compute_sale_price(self, force_zero = False):
+		for rec in self:
+			
+			if rec.is_price_type and (rec.margin != 0 or force_zero):
+				rec.list_price = rec.standard_price / (1 - rec.margin / 100.0)
+			
+			elif not rec.is_price_type and (rec.markup != 0 or force_zero):
+				rec.list_price = rec.standard_price * (1 + rec.markup / 100.0)
+			
+			elif rec.is_price_type and rec.margin == 0:
+				rec._onchange_manual_sale_price()
+			
+			elif not rec.is_price_type and rec.markup == 0:
+				rec._onchange_manual_sale_price()

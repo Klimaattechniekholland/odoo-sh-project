@@ -8,6 +8,7 @@ class ProductTemplate(models.Model):
 	# sales price => product_id.list_price
 	# cost price => product_id.standard_price
 	#
+	# dd
 	# Calculate the cost price with our Discount
 	# Cost = Sales price  * (1 - Discount)	#
 	#
@@ -76,7 +77,7 @@ class ProductTemplate(models.Model):
 		)
 	
 	
-	# === Radio button ==+ #
+	# === Radio button === #
 	
 	@api.depends('price_type')
 	def _get_price_type(self):

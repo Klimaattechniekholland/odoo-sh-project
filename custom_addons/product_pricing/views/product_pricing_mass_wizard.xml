@@ -1,0 +1,24 @@
+<odoo>
+    <data>
+        <record id="view_product_template_mass_pricing_wizard_form" model="ir.ui.view">
+            <field name="name">product.template.mass.pricing.wizard.form</field>
+            <field name="model">product.pricing.mass.wizard</field>
+            <field name="arch" type="xml">
+                <form string="Mass Pricing Update">
+                    <group>
+                        <field name="price_type" widget="radio" options="{'horizontal': True}"/>
+                        <field name="margin" invisible="is_price_type"/>
+                        <field name="markup" invisible="not is_price_type"/>
+                        <field name="supplier_discount"/>
+                        <field name="product_ids" widget="many2many_tags"/>
+                    </group>
+                    <footer>
+                        <button string="Apply" type="object" name="action_apply_pricing" class="btn-primary"/>
+                        <button string="Cancel" special="cancel"/>
+                    </footer>
+                </form>
+            </field>
+        </record>
+
+    </data>
+</odoo>

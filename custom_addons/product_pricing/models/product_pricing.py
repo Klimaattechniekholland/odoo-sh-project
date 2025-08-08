@@ -64,14 +64,14 @@ class ProductTemplate(models.Model):
 	
 	margin = fields.Float(
 		string = "Margin %",
-		defalut = 25.0,
+		default = 25.0,
 		digits = "Product Price",
 		help = "Margin over cost to calculate selling price"
 		)
 	
 	markup = fields.Float(
 		string = "Markup %",
-		defalut = 33.33,
+		default = 33.33,
 		digits = "Product Price",
 		help = "Markup over cost to calculate selling price"
 		)
@@ -123,7 +123,6 @@ class ProductTemplate(models.Model):
 			if not rec.is_price_type and rec.standard_price:
 				rec.markup = round(diff / rec.standard_price * 100, 2)
 			
-			
 			result = {}
 			if rec.is_price_type and rec.margin < 20:
 				result['warning'] = {
@@ -154,3 +153,16 @@ class ProductTemplate(models.Model):
 			
 			elif not rec.is_price_type and rec.markup == 0:
 				rec._onchange_manual_sale_price()
+	
+	
+	def open_mass_pricing_wizard(self):
+		return {
+			'name': 'Mass Pricing Update',
+			'type': 'ir.actions.act_window',
+			'res_model': 'product.pricing.mass.wizard',
+			'view_mode': 'form',
+			'target': 'new',
+			'context': {
+				'default_product_ids': self.ids
+				}
+			}

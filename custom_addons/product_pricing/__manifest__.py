@@ -1,3 +1,5 @@
+
+
 {
 	'name': 'product_pricing',
 	'version': '1.0.0',
@@ -9,7 +11,8 @@
 		'base',
 		'base_setup',
 		'contacts',
-		'product'
+		'product',
+		'purchase'
 		],
 	
 	'post_init_hook': 'setup_access_rights',
@@ -17,6 +20,8 @@
 	'data': [
 		
 		'views/product_template_product_pricing_view.xml',
+		'views/product_pricing_mass_wizard.xml',
+		'views/product_pricing_mass_action.xml'
 		
 		],
 	

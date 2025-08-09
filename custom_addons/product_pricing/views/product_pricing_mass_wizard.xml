@@ -1,5 +1,6 @@
 <odoo>
     <data>
+
         <record id="view_product_template_mass_pricing_wizard_form" model="ir.ui.view">
             <field name="name">product.template.mass.pricing.wizard.form</field>
             <field name="model">product.pricing.mass.wizard</field>

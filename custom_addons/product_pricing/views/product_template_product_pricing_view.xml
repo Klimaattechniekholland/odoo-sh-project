@@ -1,5 +1,6 @@
 <odoo>
     <data>
+
         <record id="view_product_template_inherit_pricing" model="ir.ui.view">
             <field name="name">product.template.pricing.fields</field>
             <field name="model">product.template</field>

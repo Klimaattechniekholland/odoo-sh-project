@@ -1,11 +1,11 @@
-#
+	#
 	# sales price => product_id.list_price
 	# cost price => product_id.standard_price
 	#
 	# Calculate the cost price with our Discount
 	# Cost = Sales price  * (1 - Discount)	#
 	#
-	# We normally calculate with mMargins not with Markup's
+	# We normally calculate with Margins not with Markup's
 	# Margin = (SellingPrice - Cost) / SellingPrice
 	# Markup = (Selling Price - Cost) / Cost
 	# for the same amount of money, the markup is always higher
@@ -25,8 +25,6 @@
 	# change Sale price (list_price) ==>
 	#     change the margin or markup
 
-
-
 from odoo import api, fields, models
 
 
@@ -43,7 +41,7 @@ class ProductTemplate(models.Model):
 	supplier_discount = fields.Float(
 		string = "Discount %",
 		digits = "Product Price",
-		help = "Discount from supplier, e.g. 0.15 = 15%"
+		help = "Discount from supplier %"
 		)
 	
 	price_type = fields.Selection(
@@ -79,7 +77,6 @@ class ProductTemplate(models.Model):
 	
 	
 	# === Radio button === #
-	
 	@api.depends('price_type')
 	def _get_price_type(self):
 		for rec in self:
@@ -88,7 +85,6 @@ class ProductTemplate(models.Model):
 	
 	
 	# === Onchange Logic === #
-	
 	@api.onchange('supplier_sales_price', 'supplier_discount')
 	def _onchange_supplier_price_discount(self):
 		for rec in self:

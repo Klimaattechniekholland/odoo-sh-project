@@ -13,16 +13,19 @@ def _split_xml_id(xml_id):
 def safe_env_ref(env, xml_id):
     try:
         return env.ref(xml_id)
+    
     except Exception:
         module, name = _split_xml_id(xml_id)
         if not module:
             return None
+        
         rec = env['ir.model.data'].sudo().search([
             ('module', '=', module),
             ('name', '=', name)
         ], limit=1)
         if rec:
             return env[rec.model].browse(rec.res_id)
+	    
     return None
 
 

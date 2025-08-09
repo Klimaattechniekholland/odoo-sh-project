@@ -1,5 +1,3 @@
-
-
 {
 	'name': 'Product Pricing',
 	'version': '1.0.0',

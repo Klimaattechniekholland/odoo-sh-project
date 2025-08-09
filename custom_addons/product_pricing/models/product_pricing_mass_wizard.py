@@ -29,21 +29,12 @@ class ProductPricingMassWizard(models.TransientModel):
 	markup = fields.Float(string = "Markup %")
 	supplier_discount = fields.Float(string = "Supplier Discount %")
 	
-	category_id = fields.Many2one('product.category', string = "Filter by Category")
-	
-	supplier_id = fields.Many2one(
-		'res.partner',
-		string = 'Vendor',
-		domain = [('supplier_rank', '>', 0)],
-		help = 'Only apply to products supplied by this vendor'
-		)
-	
 	product_ids = fields.Many2many(
 		'product.template', string = "Products",
 		default = lambda self: self.env.context.get('default_product_ids')
 		)
 	
-		
+	# 	do not add the static - this will break de module
 	def _chunked(self, records, size = 200):
 		it = iter(records)
 		while True:

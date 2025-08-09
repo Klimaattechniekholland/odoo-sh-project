@@ -7,8 +7,8 @@
                 <form string="Mass Pricing Update">
                     <group>
                         <field name="price_type" widget="radio" options="{'horizontal': True}"/>
-                        <field name="margin" invisible="is_price_type"/>
-                        <field name="markup" invisible="not is_price_type"/>
+                        <field name="margin" invisible="not is_price_type_margin"/>
+                        <field name="markup" invisible="is_price_type_margin"/>
                         <field name="supplier_discount"/>
                         <field name="product_ids" widget="many2many_tags"/>
                     </group>

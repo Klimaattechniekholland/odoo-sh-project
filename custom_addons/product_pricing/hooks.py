@@ -1,6 +1,5 @@
 import logging
 
-from odoo import api, SUPERUSER_ID
 from .utils.access import safe_get_or_create_group
 
 _logger = logging.getLogger(__name__)

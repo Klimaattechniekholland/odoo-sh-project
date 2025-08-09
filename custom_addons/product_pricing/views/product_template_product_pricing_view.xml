@@ -13,8 +13,8 @@
 
                 <xpath expr="//div[@name='list_price_uom']" position="after">
                     <field name="price_type" widget="radio" options="{'horizontal': True}"/>
-                    <field name="margin" invisible="not is_price_type"/>
-                    <field name="markup" invisible="is_price_type"/>
+                    <field name="margin" invisible="not is_price_type_margin"/>
+                    <field name="markup" invisible="is_price_type_margin"/>
                 </xpath>
 
             </field>

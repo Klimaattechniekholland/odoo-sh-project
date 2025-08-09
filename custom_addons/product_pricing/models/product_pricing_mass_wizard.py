@@ -1,5 +1,7 @@
-from odoo import fields, models, api, _
-from odoo.exceptions import UserError
+from itertools import islice
+
+from odoo import api, fields, models
+from odoo.exceptions import AccessError
 
 
 class ProductPricingMassWizard(models.TransientModel):
@@ -17,7 +19,7 @@ class ProductPricingMassWizard(models.TransientModel):
 		help = "Toggle between Margin and Markup strategy"
 		)
 	
-	is_price_type = fields.Boolean(
+	is_price_type_margin = fields.Boolean(
 		string = "Result",
 		compute = "_get_price_type",
 		store = False
@@ -41,67 +43,151 @@ class ProductPricingMassWizard(models.TransientModel):
 		default = lambda self: self.env.context.get('default_product_ids')
 		)
 	
-	@api.onchange('category_id', 'supplier_id')
-	def _onchange_filters(self):
-		domain = []
-		if self.category_id:
-			domain.append(('categ_id', '=', self.product_category_id.id))
-		if self.vendor_id:
-			domain.append(('seller_ids.name', '=', self.vendor_id.id))
-		if domain:
-			products = self.env['product.template'].search(domain)
-		else:
-			products = self.env['product.template'].search([])
 		
-		self.product_ids = [(6, 0, products.ids)]
-		
+	def _chunked(self, records, size = 200):
+		it = iter(records)
+		while True:
+			batch = tuple(islice(it, size))
+			if not batch:
+				return
+			yield records.browse([record.id for record in batch])
+	
 	
 	def action_apply_pricing(self):
-		for product in self.product_ids:
-			product.price_type = self.price_type
+		self.ensure_one()
+		
+		# Counters
+		total = len(self.product_ids)
+		cfg_writes = 0
+		backfilled_supplier = 0
+		cost_updates = 0
+		price_updates = 0
+		sudo_uses = 0
+		errors = 0
+		
+		# Respect company context; don’t sudo unless needed
+		products = self.product_ids.with_context(
+			allowed_company_ids = self.env.context.get('allowed_company_ids') or [self.env.company.id]
+			)
+		
+		# 1) One batch write for uniform config fields
+		common_vals = {
+			'price_type': self.price_type,
+			'supplier_discount': self.supplier_discount,  # e.g. 25 for 25%
+			}
+		if self.is_price_type_margin:
+			common_vals.update({'margin': self.margin, 'markup': 0.0})
+		else:
+			common_vals.update({'markup': self.markup, 'margin': 0.0})
+		
+		if common_vals:
+			try:
+				products.write(common_vals)
+				cfg_writes = total
+			except AccessError:
+				products.sudo().write(common_vals)
+				cfg_writes = total
+				sudo_uses += 1
+			except Exception:
+				errors += 1  # generic catch; keep going
+		
+		# 2) Recompute prices in chunks
+		for batch in self._chunked(products, size = 200):
+			# 2a) Backfill supplier_sales_price if 0 and discount set
+			to_backfill_supplier_price = []
+			for item in batch:
+				spp = item.supplier_sales_price or 0.0
+				disc = (item.supplier_discount or 0.0) / 100.0
+				if spp == 0.0 and 0.0 <= disc < 1.0 and (item.standard_price or 0.0) > 0.0:
+					supplier_price = item.standard_price / (1.0 - disc)
+					to_backfill_supplier_price.append((item, supplier_price))
+			if to_backfill_supplier_price:
+				try:
+					for item, val in to_backfill_supplier_price:
+						item.write({'supplier_sales_price': val})
+						backfilled_supplier += 1
+				except AccessError:
+					for item, val in to_backfill_supplier_price:
+						item.sudo().with_company(item.company_id).write({'supplier_sales_price': val})
+						backfilled_supplier += 1
+						sudo_uses += 1
+				except Exception:
+					errors += 1
 			
-			product.product_supplier_discount = self.supplier_discount
-			if self.is_price_type:
-				product.product_margin = self.margin
-			else:
-				product.product_markup = self.markup
+			# 2b) Update COST (standard_price) from supplier price & discount
+			to_cost = []
+			for item in batch:
+				if item.supplier_sales_price:
+					disc = (item.supplier_discount or 0.0) / 100.0
+					new_cost = item.supplier_sales_price * (1.0 - disc)
+					if (item.standard_price or 0.0) != new_cost:
+						to_cost.append((item, new_cost))
+			if to_cost:
+				try:
+					for item, val in to_cost:
+						item.write({'standard_price': val})
+						cost_updates += 1
+				except AccessError:
+					for item, val in to_cost:
+						item.sudo().with_company(item.company_id).write({'standard_price': val})
+						cost_updates += 1
+						sudo_uses += 1
+				except Exception:
+					errors += 1
 			
-			# Optional: recompute synced fields
-			product._compute_cost_price()
-			product._compute_sales_price()
+			# 2c) Update LIST PRICE from margin/markup
+			to_price = []
+			for item in batch:
+				cost = item.standard_price or 0.0
+				if item.price_type == 'margin':
+					m = (item.margin or 0.0) / 100.0
+					if 0 < m < 1:
+						price = cost / (1.0 - m)
+						if (item.list_price or 0.0) != price:
+							to_price.append((item, price))
+				else:
+					mu = (item.markup or 0.0) / 100.0
+					price = cost * (1.0 + mu)
+					if (item.list_price or 0.0) != price:
+						to_price.append((item, price))
+			if to_price:
+				try:
+					for item, val in to_price:
+						item.write({'list_price': val})
+						price_updates += 1
+				except AccessError:
+					for item, val in to_price:
+						item.sudo().with_company(item.company_id).write({'list_price': val})
+						price_updates += 1
+						sudo_uses += 1
+				except Exception:
+					errors += 1
+		
+		# 3) Toast notification + close wizard
+		msg_lines = [
+			f"Selected: {total}",
+			f"Config written: {cfg_writes}",
+			f"Supplier price backfilled: {backfilled_supplier}",
+			f"Cost updated: {cost_updates}",
+			f"Sales price updated: {price_updates}",
+			]
+		if sudo_uses:
+			msg_lines.append(f"Sudo fallbacks: {sudo_uses}")
+		if errors:
+			msg_lines.append(f"Errors: {errors} (check logs)")
+		
+		return {
+			'type': 'ir.actions.client',
+			'tag': 'display_notification',
+			'params': {
+				'title': "Mass Pricing Update",
+				'message': "\n".join(msg_lines),
+				'type': 'success' if not errors else 'warning',
+				'sticky': False,
+				'next': {'type': 'ir.actions.act_window_close'},
+				},
+			}
 	
-	
-	def apply_mass_pricing(self):
-		if not self.product_ids:
-			raise UserError(_("Please select at least one product."))
-		
-		# if not (0 < self.percentage < 100):
-		# 	raise UserError(_("Percentage must be between 0 and 100."))
-		
-		pricing_model = self.env['product.template']
-		
-		for product in self.product_ids:
-			# Auto-create pricing record if missing
-			pricing = pricing_model.search([('id', '=', product.id)], limit = 1)
-			if not pricing:
-				pricing = pricing_model.create({'id': product.id})
-			
-			if self.price_type == 'margin':
-				pricing.write(
-					{
-						'margin': self.percentage,
-						'is_price_type': True,
-						}
-					)
-			else:
-				pricing.write(
-					{
-						'markup': self.percentage,
-						'is_price_type': False,
-						}
-					)
-			
-			pricing._compute_sales_price()
 	
 	# === Radio button === #
 	
@@ -109,17 +195,6 @@ class ProductPricingMassWizard(models.TransientModel):
 	def _get_price_type(self):
 		for rec in self:
 			selection = dict(rec._fields['price_type'].selection)
-			rec.is_price_type = (selection.get(rec.price_type, '') == 'Margin')
-
-
-	def open_mass_pricing_wizard(self):
-		return {
-			'name': 'Mass Pricing Update',
-			'type': 'ir.actions.act_window',
-			'res_model': 'product.pricing.mass.wizard',
-			'view_mode': 'form',
-			'target': 'new',
-			'context': {
-				'default_product_ids': self.ids
-				}
-			}
+			rec.is_price_type_margin = (selection.get(rec.price_type, '') == 'Margin')
+	
+	

@@ -1,7 +1,7 @@
 
 
 {
-	'name': 'product_pricing',
+	'name': 'Product Pricing',
 	'version': '1.0.0',
 	'summary': 'Integrate Odoo with product management',
 	'category': 'Tools',
@@ -20,8 +20,9 @@
 	'data': [
 		
 		'views/product_template_product_pricing_view.xml',
+		'views/product_template_optional_columns.xml',
 		'views/product_pricing_mass_wizard.xml',
-		'views/product_pricing_mass_action.xml'
+		'views/product_pricing_mass_action.xml',
 		
 		],
 	

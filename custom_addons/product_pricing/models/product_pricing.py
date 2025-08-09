@@ -1,14 +1,7 @@
-from odoo import api, fields, models
-
-
-class ProductTemplate(models.Model):
-	_inherit = 'product.template'
-	
-	#
+#
 	# sales price => product_id.list_price
 	# cost price => product_id.standard_price
 	#
-	# dd
 	# Calculate the cost price with our Discount
 	# Cost = Sales price  * (1 - Discount)	#
 	#
@@ -18,7 +11,6 @@ class ProductTemplate(models.Model):
 	# for the same amount of money, the markup is always higher
 	# Margin 25%, Markup 33,333% gives the same earnings, default settings
 	#
-	# top-down
 	# change product_supplier_sale_price or product_supplier_discount ==>
 	#     change the Cost (standard_price)
 	#     change the Sale price (list_price)
@@ -32,7 +24,16 @@ class ProductTemplate(models.Model):
 	#
 	# change Sale price (list_price) ==>
 	#     change the margin or markup
+
+
+
+from odoo import api, fields, models
+
+
+class ProductTemplate(models.Model):
+	_inherit = 'product.template'
 	
+
 	supplier_sales_price = fields.Float(
 		string = "Supplier Sales Price",
 		digits = "Product Price",
@@ -56,7 +57,7 @@ class ProductTemplate(models.Model):
 		help = "Toggle between Margin and Markup strategy"
 		)
 	
-	is_price_type = fields.Boolean(
+	is_price_type_margin = fields.Boolean(
 		string = "Result",
 		compute = "_get_price_type",
 		store = False
@@ -83,7 +84,7 @@ class ProductTemplate(models.Model):
 	def _get_price_type(self):
 		for rec in self:
 			selection = dict(rec._fields['price_type'].selection)
-			rec.is_price_type = (selection.get(rec.price_type, '') == 'Margin')
+			rec.is_price_type_margin = (selection.get(rec.price_type, '') == 'Margin')
 	
 	
 	# === Onchange Logic === #
@@ -117,19 +118,19 @@ class ProductTemplate(models.Model):
 		for rec in self:
 			diff = rec.list_price - rec.standard_price
 			
-			if rec.is_price_type and rec.list_price:
+			if rec.is_price_type_margin and rec.list_price:
 				rec.margin = round((diff / rec.list_price) * 100, 2)
 			
-			if not rec.is_price_type and rec.standard_price:
+			if not rec.is_price_type_margin and rec.standard_price:
 				rec.markup = round(diff / rec.standard_price * 100, 2)
 			
 			result = {}
-			if rec.is_price_type and rec.margin < 20:
+			if rec.is_price_type_margin and rec.margin < 20:
 				result['warning'] = {
 					'title': " -- Warning Margin - - ",
 					'message': f"MARGIN is below 25%, it is now: {rec.margin} %. change it if not intended",
 					}
-			if not rec.is_price_type and rec.markup < 20:
+			if not rec.is_price_type_margin and rec.markup < 20:
 				result['warning'] = {
 					'title': " -- Warning Markup - - ",
 					'message': f"MARKUP is below 33.33%, it is now: {rec.markup} %. change it if not intended",
@@ -142,27 +143,16 @@ class ProductTemplate(models.Model):
 	def _compute_sale_price(self, force_zero = False):
 		for rec in self:
 			
-			if rec.is_price_type and (rec.margin != 0 or force_zero):
+			if rec.is_price_type_margin and (rec.margin != 0 or force_zero):
 				rec.list_price = rec.standard_price / (1 - rec.margin / 100.0)
 			
-			elif not rec.is_price_type and (rec.markup != 0 or force_zero):
+			elif not rec.is_price_type_margin and (rec.markup != 0 or force_zero):
 				rec.list_price = rec.standard_price * (1 + rec.markup / 100.0)
 			
-			elif rec.is_price_type and rec.margin == 0:
+			elif rec.is_price_type_margin and rec.margin == 0:
 				rec._onchange_manual_sale_price()
 			
-			elif not rec.is_price_type and rec.markup == 0:
+			elif not rec.is_price_type_margin and rec.markup == 0:
 				rec._onchange_manual_sale_price()
 	
 	
-	def open_mass_pricing_wizard(self):
-		return {
-			'name': 'Mass Pricing Update',
-			'type': 'ir.actions.act_window',
-			'res_model': 'product.pricing.mass.wizard',
-			'view_mode': 'form',
-			'target': 'new',
-			'context': {
-				'default_product_ids': self.ids
-				}
-			}

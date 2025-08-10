@@ -100,7 +100,7 @@ class ResConfigSettings(models.TransientModel):
 		params.set_param('bag_ep_api.ep_api_key', self.ep_api_key or '')
 		params.set_param('bag_ep_api.ep_api_recreate', 'True' if self.ep_api_recreate else 'False')
 		params.set_param('bag_ep_api.ep_api_show_warnings', 'True' if self.ep_api_show_warnings else 'False')
-	# params.set_param('bag_ep_api.ep_api_level_warnings', self.ep_api_level_warnings or 'medium')
+		# params.set_param('bag_ep_api.ep_api_level_warnings', self.ep_api_level_warnings or 'medium')
 
 # params.set_param('bag_ep_api.max_retries', str(self.max_retries))
 # params.set_param('bag_ep_api.retry_delay', str(self.retry_delay))

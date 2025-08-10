@@ -255,9 +255,9 @@ class ResPartner(models.Model):
 		result = {}
 		if self._get_recreate() and data_model and model_name and ep_lookup_status > 1:
 			# delete ep.data records linked to the partner - self
-			
 			self.ep_data_ids = [(6, 0, [])]
 			parsed = data_model
+			
 			if parsed:
 				filtered_vals = filter_model_fields(self.env, model_name, parsed.model_dump())
 				# create a new ep.data record linked to the partner - self

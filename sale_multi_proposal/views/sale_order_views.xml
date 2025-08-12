@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <odoo>
-    <!-- Extend the sale order form to include the propositions tab -->
+    <!-- Add "Proposals" tab on Sale Order -->
     <record id="view_sale_order_form_multi_proposition" model="ir.ui.view">
         <field name="name">sale.order.form.multi.proposition</field>
         <field name="model">sale.order</field>
@@ -8,13 +8,15 @@
         <field name="arch" type="xml">
             <xpath expr="//notebook" position="inside">
                 <page string="Proposals" name="proposals">
+                    <!-- No active_id context needed; o2m will link by M2O automatically -->
                     <field name="proposition_ids">
-                        <tree string="Proposals" editable="bottom">
+                        <list string="Proposals" editable="bottom" default_order="sequence">
                             <field name="sequence" invisible="1"/>
                             <field name="name"/>
-                            <field name="amount_total" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                            <field name="amount_total" widget="monetary" options="{'currency_field': 'currency_id'}" readonly="1"/>
                             <field name="state"/>
-                        </tree>
+                            <field name="currency_id" invisible="1"/>
+                        </list>
                     </field>
                 </page>
             </xpath>

@@ -1,17 +1,13 @@
 {
     'name': 'Sale Multi Proposal',
-    'version': '18.0.1.0.0',
-    'author': 'Your Company',
-    'license': 'LGPL-3',
-    'category': 'Sales',
-    'website': 'https://example.com',
     'summary': 'Allow multiple proposals per sale order and prevent partner address loops',
-    'description': 'This module extends the Sale application to support multiple proposals '
-                   'within a single sale order.  Sales people can add several alternative '
-                   'proposal lines to a sale order and customers may choose one to confirm. '
-                   'The module also adds a constraint on partners to avoid recursive parent–child '
-                   'relationships (address loops).',
-    'depends': ['sale_management'],
+    'description': "Adds multi-page quotation and invoice layouts (client info, house photo, system description, kit details, terms), custom fields on Sale Orders and Invoices, QR code support for signing, partner-language email templates, and a dynamic service contract wizard.",
+    'author': "Klimaat Techniek Holland B.V.",
+    'website': "http://www.klimaattechniekholland.nl",
+    'version': '18.0.1.0.0',
+    'category': 'Sales',
+    'license': 'LGPL-3',
+    'depends': ['sale_management','sale',],
     'data': [
         'security/ir.model.access.csv',
         'views/sale_order_proposition_views.xml',

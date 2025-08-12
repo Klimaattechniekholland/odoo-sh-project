@@ -1,11 +1,3 @@
-"""Extension of sale.order to support multiple proposals.
-
-Adds one2many and many2one fields linking sale orders with
-propositions and exposes helper methods for computing totals based
-on a selected proposition.  The ``selected_proposition_id`` field
-references the proposition that has been chosen by the customer.
-"""
-
 from odoo import api, fields, models
 
 

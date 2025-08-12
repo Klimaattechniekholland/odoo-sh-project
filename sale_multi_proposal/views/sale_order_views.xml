@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <!-- Extend the sale order form to include the propositions tab -->
+    <record id="view_sale_order_form_multi_proposition" model="ir.ui.view">
+        <field name="name">sale.order.form.multi.proposition</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_order_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//notebook" position="inside">
+                <page string="Proposals" name="proposals">
+                    <field name="proposition_ids">
+                        <tree string="Proposals" editable="bottom">
+                            <field name="sequence" invisible="1"/>
+                            <field name="name"/>
+                            <field name="amount_total" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                            <field name="state"/>
+                        </tree>
+                    </field>
+                </page>
+            </xpath>
+        </field>
+    </record>
+</odoo>

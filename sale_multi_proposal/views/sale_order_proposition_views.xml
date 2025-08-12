@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <!-- Form view for propositions -->
+    <record id="view_sale_order_proposition_form" model="ir.ui.view">
+        <field name="name">sale.order.proposition.form</field>
+        <field name="model">sale.order.proposition</field>
+        <field name="arch" type="xml">
+            <form string="Proposition" create="false" edit="true">
+                <sheet>
+                    <group>
+                        <field name="sale_order_id" readonly="1"/>
+                        <field name="name"/>
+                        <field name="state" readonly="1"/>
+                        <field name="amount_total" widget="monetary" options="{'currency_field': 'currency_id'}" readonly="1"/>
+                    </group>
+                    <notebook>
+                        <page string="Lines">
+                            <field name="line_ids">
+                                <tree editable="bottom" string="Proposition Lines">
+                                    <field name="product_id"/>
+                                    <field name="name"/>
+                                    <field name="product_uom_qty"/>
+                                    <field name="price_unit"/>
+                                    <field name="discount"/>
+                                    <field name="tax_id"/>
+                                    <field name="price_subtotal" readonly="1"/>
+                                </tree>
+                            </field>
+                        </page>
+                        <page string="Notes">
+                            <field name="note"/>
+                        </page>
+                    </notebook>
+                    <footer>
+                        <button name="action_confirm_proposition" type="object" string="Confirm Proposition"
+                                class="btn-primary" attrs="{'invisible': [('state','!=','draft')]}">
+                        </button>
+                        <button string="Cancel" class="btn-secondary" special="cancel"/>
+                    </footer>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Tree/list view for propositions -->
+    <record id="view_sale_order_proposition_tree" model="ir.ui.view">
+        <field name="name">sale.order.proposition.tree</field>
+        <field name="model">sale.order.proposition</field>
+        <field name="arch" type="xml">
+            <tree string="Propositions" default_order="sequence">
+                <field name="sequence" invisible="1"/>
+                <field name="name"/>
+                <field name="amount_total" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                <field name="state"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- Tree view for proposition lines -->
+    <record id="view_sale_order_proposition_line_tree" model="ir.ui.view">
+        <field name="name">sale.order.proposition.line.tree</field>
+        <field name="model">sale.order.proposition.line</field>
+        <field name="arch" type="xml">
+            <tree string="Proposition Lines" editable="bottom">
+                <field name="product_id"/>
+                <field name="name"/>
+                <field name="product_uom_qty"/>
+                <field name="price_unit"/>
+                <field name="discount"/>
+                <field name="tax_id"/>
+                <field name="price_subtotal" readonly="1"/>
+            </tree>
+        </field>
+    </record>
+</odoo>

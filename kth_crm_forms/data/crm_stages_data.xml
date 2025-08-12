@@ -1,74 +1,53 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <odoo>
-    <!--
-        Predefine CRM pipeline stages for Klimaat Techniek Holland.
-
-        These records are marked with noupdate="1" so that if stages
-        already exist (e.g., created manually in another database), they
-        are not duplicated when the module is installed or updated.
-    -->
-    <data noupdate="1">
+<data noupdate="1">
         <record id="stage_new_lead" model="crm.stage">
             <field name="name">New Lead</field>
             <field name="sequence">1</field>
-            <field name="type">opportunity</field>
         </record>
         <record id="stage_intake" model="crm.stage">
             <field name="name">Intake</field>
             <field name="sequence">2</field>
-            <field name="type">opportunity</field>
         </record>
         <record id="stage_provisional_quote" model="crm.stage">
             <field name="name">Provisional Quote</field>
             <field name="sequence">3</field>
-            <field name="type">opportunity</field>
         </record>
         <record id="stage_site_inspection" model="crm.stage">
             <field name="name">Site Inspection</field>
             <field name="sequence">4</field>
-            <field name="type">opportunity</field>
         </record>
         <record id="stage_definitive_quote" model="crm.stage">
             <field name="name">Definitive Quote</field>
             <field name="sequence">5</field>
-            <field name="type">opportunity</field>
         </record>
         <record id="stage_order_confirmed" model="crm.stage">
             <field name="name">Order Confirmed</field>
             <field name="sequence">6</field>
-            <field name="type">opportunity</field>
         </record>
         <record id="stage_schedule_installation" model="crm.stage">
             <field name="name">Schedule Installation</field>
             <field name="sequence">7</field>
-            <field name="type">opportunity</field>
         </record>
         <record id="stage_installation" model="crm.stage">
             <field name="name">Installation</field>
             <field name="sequence">8</field>
-            <field name="type">opportunity</field>
         </record>
         <record id="stage_completion_handover" model="crm.stage">
             <field name="name">Completion &amp; Handover</field>
             <field name="sequence">9</field>
-            <field name="type">opportunity</field>
         </record>
         <record id="stage_invoicing" model="crm.stage">
             <field name="name">Invoicing</field>
             <field name="sequence">10</field>
-            <field name="type">opportunity</field>
         </record>
         <record id="stage_won" model="crm.stage">
             <field name="name">Won</field>
             <field name="sequence">11</field>
-            <field name="type">opportunity</field>
-            <field name="fold">True</field>
         </record>
         <record id="stage_lost" model="crm.stage">
             <field name="name">Lost</field>
             <field name="sequence">12</field>
-            <field name="type">opportunity</field>
-            <field name="fold">True</field>
         </record>
     </data>
 </odoo>

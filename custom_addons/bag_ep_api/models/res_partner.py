@@ -74,6 +74,11 @@ class ResPartner(models.Model):
 			if key not in vals:
 				vals[key] = buffer[key]
 		
+		if self.is_company:
+			#  delete all related ep-data records
+			vals['ep_data_ids'] = []
+			
+	
 		res = super().write(vals)
 		
 		return res
@@ -114,7 +119,7 @@ class ResPartner(models.Model):
 						)
 			
 			if not warnings:
-				if record.parent_id:
+				if record.parent_id or record.is_company:
 					fetched_data, warnings = ResolverManager(self).resolve_zip(warnings, True)
 				else:
 					fetched_data, warnings = ResolverManager(self).resolve_all(warnings, True)

@@ -6,7 +6,7 @@
             <field name="inherit_id" ref="base.view_partner_form"/>
             <field name="arch" type="xml">
                 <xpath expr="//form[1]/sheet[1]/notebook[1]" position="inside">
-                    <page string="Ep Online" name="studio_page_8e_1iti45jmf">
+                    <page string="Ep Online" name="studio_page_8e_1iti45jmf" invisible="is_company">
                         <group name="studio_group_8e">
                             <group name="studio_group_8e_left"/>
                             <group name="studio_group_8e_right"/>
@@ -20,8 +20,8 @@
                                     icon="fa-refresh"/>
                         </div>
                         <!-- the list just one item-->
-                        <field name="ep_data_ids">
-                            <list string="EP Information" create="false" edit="false" delete="false">
+                        <field name="ep_data_ids" >
+                            <list string="EP Information" create="False" edit="False" delete="False">
                                 <field name="building_class" optional="show"/>
                                 <field name="building_type" optional="show"/>
                                 <field name="building_subtype" optional="show"/>

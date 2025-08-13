@@ -35,8 +35,12 @@ class ResolverManager:
 	
 	
 	def resolve_all(self, warnings = None, fields = False):
+		# ToDo: parameter fields , check and possible remane it appropriate, for all resolver(s)
+		# Step - ZIP resolver
 		self.resolve_zip(warnings, fields)
+		# Step - BAG Resolver and EP Resolver
 		self.resolve_bag_ep(warnings)
+		
 		return self._fetched_data, self._warnings
 	
 	
@@ -47,8 +51,10 @@ class ResolverManager:
 		zip_data, self._warnings = ZipApiResolver(self.partner).get(self._warnings)
 		if zip_data and not self._warnings:
 			self._parsed_data = ZipApiResolver(self.partner).values_from_data(zip_data)
+			
 			if fields:
-				ZipApiResolver(self.partner).fields_from_data(zip_data)
+				self._parsed_data = ZipApiResolver(self.partner).fields_from_data(zip_data)
+				
 			return self._parsed_data
 		
 		return None
@@ -69,12 +75,16 @@ class ResolverManager:
 			self._fetched_data = self._bag_data
 	
 	
-	def _run_ep(self, ):
+	def _run_ep(self):
 		if self._warnings:
 			return
 		
+		result = self._fetched_data
 		self._fetched_data, self._warnings = EpApiResolver(self.partner).get(self._warnings)
+		
 		if self._warnings:
+			# warning there is no EP information  use the BAG information
+			self._fetched_data = result
 			return
 		
 		self._fetched_data = EpApiResolver(self.partner).apply_from_data(self._fetched_data, self._bag_data)

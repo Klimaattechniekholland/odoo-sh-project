@@ -1,3 +1,5 @@
+from operator import truediv
+
 from odoo import _, api, fields, models
 
 
@@ -54,14 +56,14 @@ class ResConfigSettings(models.TransientModel):
 	ep_api_recreate = fields.Boolean(
 		string = _("EP API Recreate"),
 		config_parameter = "bag_ep_api.ep_api_recreate",
-		default = False,
+		default = True,
 		company_dependent = True
 		)
 	
 	ep_api_show_warnings = fields.Boolean(
 		string = _("EP API Show Warnings"),
 		config_parameter = "bag_ep_api.ep_api_show_warnings",
-		default = False,
+		default = True,
 		company_dependent = True
 		)
 	

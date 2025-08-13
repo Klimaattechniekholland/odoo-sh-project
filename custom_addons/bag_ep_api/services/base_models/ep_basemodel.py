@@ -40,18 +40,4 @@ class EpDataSchema(BaseModel):
     }
 
 
-# compactheid = gerbuiksoppervlak (GBO) / verlies oppervlak (A_Verlies)
-#      A_Verlies is de berekend verlies oppervlak van de buitenkant / gevel.
-#
-# energie behoefte is de totale energie per m2 per jaar.
-#
-# voor een warmte pomp reken je:
-#   kW per jaar  = wramtebehoefte  * oppervlakte
-#   kW-WP = kWpj / vollast uren.
-# Vollast uren zijn vast gesteld op gemiddlede van 1640 uur.
-# deze kan vaieren tussen 1000 en 2000 uur, geheel afhankelijk van de energieklasse.
-#
-# koelbehoefte = energiebehoefte - warmtebehoefte
-#
-# huishouden  ongeveer 5000 kWh per jaar
-# tapwater per jaar uirekenen
+

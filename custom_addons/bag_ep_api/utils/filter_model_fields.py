@@ -18,8 +18,10 @@ def filter_model_fields(env, model_name, raw_values: dict):
 		if field_name in field_transformations:
 			try:
 				cleaned_values[field_name] = field_transformations[field_name](raw_value)
+				
 			except Exception:
 				cleaned_values[field_name] = None  # Optional: log the error
+				
 		else:
 			cleaned_values[field_name] = raw_value
 	

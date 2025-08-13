@@ -16,39 +16,6 @@ _logger = logging.getLogger(__name__)
 class ResPartner(models.Model):
 	_inherit = 'res.partner'
 	
-	# get address items from zip and full house number, for the Dutch market,
-	# country_id = 165, NL, The Netherlands.
-	# to get from the full house number: 70, 70 A, 70-1, 70A-1
-	# the number, 70
-	# optional letters, an
-	# optional extension, -1
-	# if the ZipData(BaseModel) is found then fill the fields bag_api for the street and city
-	# populates the result data in res.partner table/fields.
-	# with the ep-online call, we get all Energy Label information
-	# when the square meters or built year are not given by the ep-online
-	# use BagApi to get the information.
-	# the Zip information is a class (Basemodel), not stored in the database.
-	# the EpData information is a class (models.Model) with Many2One reference in res.partner
-	# and stored in the database.
-	
-	#
-	# NOTE:
-	# do not use the raise User Error it will refill the form with the saved data.
-	#
-	# self.ep_data_ids = [(5, 0, 0)]
-	# self.ep_data_ids += [(0, 0, vals) for vals in filtered_vals]  - multiple records
-	# self.ep_data_ids += [(0, 0, filtered_vals)] - one record
-	#
-	# | Command | Format | Description |
-	# | ------- | ----------------- | ---------------------------------------------------------------------------- |
-	# | `0`     | `(0, 0, values)`  | Create a new record with the given `values` (dict of field values).|
-	# | `1`     | `(1, ID, values)` | Update the record with `ID` using the given `values`.|
-	# | `2`     | `(2, ID, 0)`      | Delete the record with `ID`.Only works on `One2many`.|
-	# | `3`     | `(3, ID, 0)`      | Unlink the  record with `ID` from the relation, but do not delete it.|
-	# | `4`     | `(4, ID, 0)`      | Link to an existing record  with `ID`.Does not create or update.|
-	# | `5`     | `(5, 0, 0)`       | Clear all existing records in the relation. | deprecated use (6, 0, [])
-	# | `6`     | `(6, 0, [IDs])`   | Replace al existing links with the provided list of IDs.|
-	
 	full_house_number = fields.Char(string = 'Full Number', required = True, translate = True)
 	
 	house_number = fields.Integer(string = 'Number', readonly = True)
@@ -61,7 +28,8 @@ class ResPartner(models.Model):
 		string = "EP Lookup status",
 		tracking = True,
 		readonly = True,
-		default = 0)
+		default = 0
+		)
 	# 0 | not found
 	# 1 | ZIP found
 	# 2 | BAG found
@@ -101,25 +69,14 @@ class ResPartner(models.Model):
 	def write(self, vals):
 		
 		buffer = BufferManager.get(self.env.user.id)
+		
 		for key in buffer:
 			if key not in vals:
 				vals[key] = buffer[key]
 		
 		res = super().write(vals)
-		# for record in self:
-		#
-		# 	if record.ep_lookup_status == 0 and self.env.context.get('install_mode') is not True:
-		# 		raise ValidationError(_('EP Lookup status cannot be 0'))
-		#
+		
 		return res
-	
-	
-	# @api.constrains('ep_lookup_status')
-	# def _check_ep_lookup_status(self):
-	# 	for rec in self:
-	# 		if rec.ep_lookup_status == 0:
-	# 			raise ValidationError(_('EP Lookup status cannot be 0'))
-	
 	
 	
 	@api.onchange('country_id')
@@ -155,7 +112,7 @@ class ResPartner(models.Model):
 							'zip': record.zip
 							}
 						)
-		
+			
 			if not warnings:
 				if record.parent_id:
 					fetched_data, warnings = ResolverManager(self).resolve_zip(warnings, True)
@@ -197,10 +154,6 @@ class ResPartner(models.Model):
 		warnings = []
 		fetched_data = None
 		for partner in self:
-			# partner.ep_lookup_status = 0
-			# BufferManager.set(self.env.user.id,'ep_lookup_status', 0)
-			
-			# partner.parse_full_house_number(warnings)
 			
 			if not warnings:
 				if partner.parent_id:
@@ -242,7 +195,7 @@ class ResPartner(models.Model):
 							full_number = f"{number}{letter}"
 						
 						record.full_house_number = full_number
-						# this will trigger the onchange for full_house_number
+				# this will trigger the onchange for full_house_number
 	
 	
 	def _handle_onchange_result(self, warnings = None, model_name = None, data_model = None, ep_lookup_status = None):
@@ -253,9 +206,10 @@ class ResPartner(models.Model):
 		# Need to set the delete to cascade then there will be no records with empty partner_id.
 		#
 		result = {}
+		# delete ep.data records linked to the partner - self
+		self.ep_data_ids = [(6, 0, [])]
+		
 		if self._get_recreate() and data_model and model_name and ep_lookup_status > 1:
-			# delete ep.data records linked to the partner - self
-			self.ep_data_ids = [(6, 0, [])]
 			parsed = data_model
 			
 			if parsed:
@@ -275,24 +229,31 @@ class ResPartner(models.Model):
 	
 	
 	def _get_recreate(self):
-		api_recreate = self.env['ir.config_parameter'].sudo().with_context(company_id = self.env.company.id).get_param(
+		api_recreate = self.env['ir.config_parameter'].sudo().with_context(
+			company_id = self.env.company.id
+			).get_param(
 			'bag_ep_api.ep_api_recreate', default = ''
-			).strip() or False
-		return api_recreate
+			).strip().lower() or False
+		return api_recreate == 'true'
+	
 	
 	def _get_show_warnings(self):
-		api_show_warnings = self.env['ir.config_parameter'].sudo().with_context(company_id = self.env.company.id).get_param(
+		api_show_warnings = self.env['ir.config_parameter'].sudo().with_context(
+			company_id = self.env.company.id
+			).get_param(
 			'bag_ep_api.ep_api_show_warnings', default = ''
-			).strip() or False
-		return api_show_warnings
+			).strip().lower() or False
+		
+		return api_show_warnings == 'true'
+	
 	
 	def _get_level_warnings(self):
 		api_level_warnings = self.env['ir.config_parameter'].sudo().with_context(
 			company_id = self.env.company.id
 			).get_param(
 			'bag_ep_api.ep_api_level_warnings', default = 'none'
-			).strip() or False
-		return api_level_warnings
+			).strip().lower() or False
+		return api_level_warnings == 'true'
 	
 	
 	def action_reset_to_defaults(self):

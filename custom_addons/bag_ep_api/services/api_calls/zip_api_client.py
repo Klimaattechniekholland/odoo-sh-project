@@ -64,7 +64,9 @@ class ZipApiResolver(BaseEpResolver):
 		self.partner.state_id = state or False
 		self.partner.country_id = self.env.ref('base.nl').id
 		self.partner.ep_lookup_status = 1
+		
 		BufferManager.set(self.env.user.id,'ep_lookup_status',1 )
+		
 		return None
 
 

@@ -45,6 +45,7 @@ class EpApiResolver(BaseEpResolver):
 		
 		_logger.info(f"[EP] Autofill completed for {self.partner.name}.")
 		self.partner.ep_lookup_status = 3
+		
 		BufferManager.set(self.env.user.id, 'ep_lookup_status', 3)
 		
 		return ep_data

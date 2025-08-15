@@ -1,0 +1,92 @@
+<odoo>
+    <data>
+        <record id="view_partner_form_ep_custom" model="ir.ui.view">
+            <field name="name">res.partner.form.ep.custom</field>
+            <field name="model">res.partner</field>
+            <field name="inherit_id" ref="base.view_partner_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//form[1]/sheet[1]/notebook[1]" position="inside">
+                    <page string="Ep Online" name="studio_page_8e_1iti45jmf" invisible="is_company">
+                        <group name="studio_group_8e">
+                            <group name="studio_group_8e_left"/>
+                            <group name="studio_group_8e_right"/>
+                        </group>
+
+                        <div class="oe_button_box" name="button_box">
+                            <button name="action_ep_api_lookup" type="object"
+                                    string="Update" class="btn btn-primary" icon="fa-refresh"/>
+                        </div>
+
+                        <!-- One2many forced to Kanban (no list) -->
+                        <!-- IMPORTANT: do NOT set any widget= override on this field in other views -->
+                        <field name="ep_data_ids" mode="kanban">
+                            <kanban sample="1" create="false" edit="false" delete="false" limit="2"
+                                    default_order="write_date desc">
+                                <!-- Prefetch every field you reference via record.<field> -->
+                                <field name="building_class"/>
+                                <field name="construction_year"/>
+                                <field name="building_type"/>
+                                <field name="building_subtype"/>
+                                <field name="energy_label"/>
+                                <field name="usable_area"/>
+                                <field name="usable_area_thermal_zone"/>
+                                <field name="compactness"/>
+
+                                <templates>
+                                    <!-- v18: root template is 'card' -->
+                                    <t t-name="card" class="flex-row p-2">
+                                        <aside class="o_kanban_aside_full pe-2">
+                                            <div class="fw-bold">BAG-EP</div>
+                                        </aside>
+
+                                        <main class="ps-2">
+                                            <div class="mb-1">
+                                                <div class="fw-bold">Building</div>
+                                                <div t-if="record.construction_year and record.construction_year.raw_value"
+                                                     class="mt-1">
+                                                    <t t-translation="yes">Construction Year</t>: <t
+                                                        t-esc="record.construction_year.raw_value"/>
+                                                </div>
+
+                                                <div>
+                                                    <t t-if="record.building_class and record.building_class.raw_value">
+                                                        <t t-esc="record.building_class.value"/>
+                                                    </t>
+                                                    <t t-if="record.building_type and record.building_type.raw_value">
+                                                        — <t t-esc="record.building_type.value"/>
+                                                    </t>
+                                                    <t t-if="record.building_subtype and record.building_subtype.raw_value">
+                                                        / <t t-esc="record.building_subtype.value"/>
+                                                    </t>
+                                                </div>
+                                            </div>
+
+                                            <div t-if="(record.usable_area and record.usable_area.raw_value) or
+                                                        (record.usable_area_thermal_zone and record.usable_area_thermal_zone.raw_value)">
+                                                <div t-if="record.usable_area and record.usable_area.raw_value">
+                                                    Usable: <t t-esc="record.usable_area.value"/> m2
+                                                </div>
+                                                <div t-if="record.usable_area_thermal_zone and record.usable_area_thermal_zone.raw_value">
+                                                    Thermal zone: <t t-esc="record.usable_area_thermal_zone.value"/> m2
+                                                </div>
+                                            </div>
+
+                                            <div t-if="record.compactness and record.compactness.raw_value"
+                                                 class="mt-1">
+                                                Compactness: <t t-esc="record.compactness.value"/>
+                                            </div>
+
+                                            <footer>
+                                                <div/>
+                                            </footer>
+                                        </main>
+                                    </t>
+                                </templates>
+                            </kanban>
+                        </field>
+                    </page>
+                </xpath>
+            </field>
+        </record>
+    </data>
+</odoo>

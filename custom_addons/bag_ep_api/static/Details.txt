@@ -33,13 +33,17 @@
 	# | `6`     | `(6, 0, [IDs])`   | Replace al existing links with the provided list of IDs.|
 
 
-# compactheid = gerbuiksoppervlak (GBO) / verlies oppervlak (A_Verlies)
+# compactheid = gebruiksoppervlak (GBO) / verlies oppervlak (A_Verlies)
 #      A_Verlies is de berekend verlies oppervlak van de buitenkant / gevel.
 #
+# Compactness = Usable area / Surface of heat loss
+# Surface heat loss = surface of the oustside
+
 # energie behoefte is de totale energie per m2 per jaar.
 #
+
 # voor een warmte pomp reken je:
-#   kW per jaar  = wramtebehoefte  * oppervlakte
+#   kW per jaar  = warmtebehoefte  * oppervlakte
 #   kW-WP = kWpj / vollast uren.
 # Vollast uren zijn vast gesteld op gemiddlede van 1640 uur.
 # deze kan vaieren tussen 1000 en 2000 uur, geheel afhankelijk van de energieklasse.

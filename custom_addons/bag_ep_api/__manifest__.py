@@ -15,7 +15,7 @@
 	
 	'data': [
 		'views/res_config_settings_view.xml',
-		'views/res_partner_ep_online_view.xml',
+		'views/res_partner_ep_online_custom_view.xml',
 		'views/res_partner_zip_full_number_view.xml',
 		],
 	

@@ -78,7 +78,6 @@ class ResPartner(models.Model):
 			#  delete all related ep-data records
 			vals['ep_data_ids'] = []
 			
-	
 		res = super().write(vals)
 		
 		return res

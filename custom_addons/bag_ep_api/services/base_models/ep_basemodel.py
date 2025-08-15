@@ -2,6 +2,8 @@ from pydantic import BaseModel, Field
 from typing import Optional, List
 from datetime import datetime
 
+
+
 class EpDataSchema(BaseModel):
     registration_date: Optional[datetime] = Field(default=None, alias='Registratiedatum')
     recording_date: Optional[datetime] = Field(default=None, alias='Opnamedatum')
@@ -20,7 +22,7 @@ class EpDataSchema(BaseModel):
     house_number_addition: int = Field(default=0, alias='Huisnummertoevoeging')
     bag_residence_id: str = Field(default="", alias='BAGVerblijfsobjectID')
     bag_building_ids: List[str] = Field(default_factory=list, alias='BAGPandIDs')
-    construction_year: int = Field(default=0, alias='Bouwjaar')
+    construction_year: int = Field(default = 0, alias='Bouwjaar')
     usable_area_thermal_zone: float = Field(default=0.0, alias='Gebruiksoppervlakte_thermische_zone')
     usable_area: float = Field(default=0.0, alias='Gebruiksoppervlakte')
     compactness: float = Field(default=0.0, alias='Compactheid')

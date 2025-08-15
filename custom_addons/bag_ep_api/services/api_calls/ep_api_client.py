@@ -34,9 +34,10 @@ class EpApiResolver(BaseEpResolver):
 		if ep_data and bag_data:
 			if ep_data.usable_area == 0:
 				ep_data.usable_area = bag_data.usable_area or 0
+				
 			if ep_data.construction_year == 0:
 				ep_data.construction_year = bag_data.construction_year or 0
-		
+
 		if not ep_data:
 			ep_data = bag_data
 		

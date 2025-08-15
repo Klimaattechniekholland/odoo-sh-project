@@ -47,3 +47,4 @@ class EpData(models.Model):
 	heat_demand = fields.Float(string = _("Heat Demand"))
 	calculated_co2_emission = fields.Float(string = _("Calculated CO₂ Emission"))
 	calculated_energy_consumption = fields.Float(string = _("Calculated Energy Consumption"))
+

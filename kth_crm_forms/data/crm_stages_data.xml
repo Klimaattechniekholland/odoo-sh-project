@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+<data noupdate="1">
+        <record id="stage_new_lead" model="crm.stage">
+            <field name="name">New Lead</field>
+            <field name="sequence">1</field>
+        </record>
+        <record id="stage_intake" model="crm.stage">
+            <field name="name">Intake</field>
+            <field name="sequence">2</field>
+        </record>
+        <record id="stage_provisional_quote" model="crm.stage">
+            <field name="name">Provisional Quote</field>
+            <field name="sequence">3</field>
+        </record>
+        <record id="stage_site_inspection" model="crm.stage">
+            <field name="name">Site Inspection</field>
+            <field name="sequence">4</field>
+        </record>
+        <record id="stage_definitive_quote" model="crm.stage">
+            <field name="name">Definitive Quote</field>
+            <field name="sequence">5</field>
+        </record>
+        <record id="stage_order_confirmed" model="crm.stage">
+            <field name="name">Order Confirmed</field>
+            <field name="sequence">6</field>
+        </record>
+        <record id="stage_schedule_installation" model="crm.stage">
+            <field name="name">Schedule Installation</field>
+            <field name="sequence">7</field>
+        </record>
+        <record id="stage_installation" model="crm.stage">
+            <field name="name">Installation</field>
+            <field name="sequence">8</field>
+        </record>
+        <record id="stage_completion_handover" model="crm.stage">
+            <field name="name">Completion &amp; Handover</field>
+            <field name="sequence">9</field>
+        </record>
+        <record id="stage_invoicing" model="crm.stage">
+            <field name="name">Invoicing</field>
+            <field name="sequence">10</field>
+        </record>
+        <record id="stage_won" model="crm.stage">
+            <field name="name">Won</field>
+            <field name="sequence">11</field>
+        </record>
+        <record id="stage_lost" model="crm.stage">
+            <field name="name">Lost</field>
+            <field name="sequence">12</field>
+        </record>
+    </data>
+</odoo>

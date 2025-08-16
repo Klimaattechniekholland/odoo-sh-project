@@ -36,7 +36,7 @@
 # compactheid = gebruiksoppervlak (GBO) / verlies oppervlak (A_Verlies)
 #      A_Verlies is de berekend verlies oppervlak van de buitenkant / gevel.
 #
-# Compactness = Usable area / Surface of heat loss
+# Compactness = Usable area (GBO) / Surface of heat loss
 # Surface heat loss = surface of the oustside
 
 # energie behoefte is de totale energie per m2 per jaar.

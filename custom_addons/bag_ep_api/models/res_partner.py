@@ -39,6 +39,7 @@ class ResPartner(models.Model):
 		'ep.data',  # target model
 		'partner_id',  # inverse field in ep.data
 		store = True,
+		context = {'form_view_ref': 'res_partner_ep_all_fields'}
 		)
 	
 	

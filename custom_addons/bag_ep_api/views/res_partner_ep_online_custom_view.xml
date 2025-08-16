@@ -1,28 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <odoo>
     <data>
-        <record id="view_partner_form_ep_custom" model="ir.ui.view">
-            <field name="name">res.partner.form.ep.custom</field>
+
+        <!-- Inherit base partner form and add "Ep Online" page with O2M in Kanban + inline Form -->
+        <record id="view_partner_form_ep_online_kanban_inline" model="ir.ui.view">
+            <field name="name">res.partner.form.ep.online.kanban.inline</field>
             <field name="model">res.partner</field>
             <field name="inherit_id" ref="base.view_partner_form"/>
             <field name="arch" type="xml">
-                <xpath expr="//form[1]/sheet[1]/notebook[1]" position="inside">
-                    <page string="Ep Online" name="studio_page_8e_1iti45jmf" invisible="is_company">
-                        <group name="studio_group_8e">
-                            <group name="studio_group_8e_left"/>
-                            <group name="studio_group_8e_right"/>
-                        </group>
 
+                <!-- Insert a new page into the notebook -->
+                <xpath expr="//form//sheet//notebook" position="inside">
+                    <!--          <page string="Ep Online" name="ep_online" attrs="{'invisible':[('is_company','=',True)]}">-->
+
+                    <page string="Ep Online" name="ep_online">
+
+                        <!-- Optional: action button -->
                         <div class="oe_button_box" name="button_box">
                             <button name="action_ep_api_lookup" type="object"
                                     string="Update" class="btn btn-primary" icon="fa-refresh"/>
                         </div>
 
-                        <!-- One2many forced to Kanban (no list) -->
-                        <!-- IMPORTANT: do NOT set any widget= override on this field in other views -->
+                        <!-- One2many shown as Kanban with inline Form (opens on click) -->
                         <field name="ep_data_ids" mode="kanban">
-                            <kanban sample="1" create="false" edit="false" delete="false" limit="2"
+
+                            <!-- KANBAN SUBVIEW -->
+                            <kanban sample="1" create="false" edit="false" delete="false"
                                     default_order="write_date desc">
-                                <!-- Prefetch every field you reference via record.<field> -->
+                                <!-- Prefetch every field referenced in the template -->
                                 <field name="building_class"/>
                                 <field name="construction_year"/>
                                 <field name="building_type"/>
@@ -31,9 +36,10 @@
                                 <field name="usable_area"/>
                                 <field name="usable_area_thermal_zone"/>
                                 <field name="compactness"/>
+                                <field name="design_kw"/>
+                                <field name="outdoor_design_temp"/>
 
                                 <templates>
-                                    <!-- v18: root template is 'card' -->
                                     <t t-name="card" class="flex-row p-2">
                                         <aside class="o_kanban_aside_full pe-2">
                                             <div class="fw-bold">BAG-EP</div>
@@ -42,51 +48,110 @@
                                         <main class="ps-2">
                                             <div class="mb-1">
                                                 <div class="fw-bold">Building</div>
-                                                <div t-if="record.construction_year and record.construction_year.raw_value"
+
+                                                <div t-if="record.construction_year and record.construction_year.raw_value != null"
                                                      class="mt-1">
-                                                    <t t-translation="yes">Construction Year</t>: <t
-                                                        t-esc="record.construction_year.raw_value"/>
+                                                    <t t-translation="yes">Construction Year</t>:
+                                                    <t t-esc="record.construction_year.raw_value"/>
                                                 </div>
 
                                                 <div>
-                                                    <t t-if="record.building_class and record.building_class.raw_value">
+                                                    <t t-if="record.building_class and record.building_class.raw_value != null">
                                                         <t t-esc="record.building_class.value"/>
                                                     </t>
-                                                    <t t-if="record.building_type and record.building_type.raw_value">
+                                                    <t t-if="record.building_type and record.building_type.raw_value != null">
                                                         — <t t-esc="record.building_type.value"/>
                                                     </t>
-                                                    <t t-if="record.building_subtype and record.building_subtype.raw_value">
+                                                    <t t-if="record.building_subtype and record.building_subtype.raw_value != null">
                                                         / <t t-esc="record.building_subtype.value"/>
                                                     </t>
                                                 </div>
                                             </div>
 
-                                            <div t-if="(record.usable_area and record.usable_area.raw_value) or
-                                                        (record.usable_area_thermal_zone and record.usable_area_thermal_zone.raw_value)">
-                                                <div t-if="record.usable_area and record.usable_area.raw_value">
-                                                    Usable: <t t-esc="record.usable_area.value"/> m2
+                                            <div>
+                                                <div t-if="record.usable_area and record.usable_area.raw_value != null">
+                                                    Usable: <t t-esc="record.usable_area.value"/> m²
                                                 </div>
-                                                <div t-if="record.usable_area_thermal_zone and record.usable_area_thermal_zone.raw_value">
-                                                    Thermal zone: <t t-esc="record.usable_area_thermal_zone.value"/> m2
+                                                <div t-if="record.usable_area_thermal_zone and record.usable_area_thermal_zone.raw_value != null">
+                                                    Thermal zone: <t t-esc="record.usable_area_thermal_zone.value"/> m²
+                                                </div>
+                                                <div t-if="record.outdoor_design_temp and record.outdoor_design_temp.raw_value != null">
+                                                    OutDoor: <t t-esc="record.outdoor_design_temp.value"/> (°C)
+                                                </div>
+                                                <div t-if="record.design_kw and record.design_kw.raw_value != null">
+                                                    Design Capacity: <t t-esc="record.design_kw.value"/> (pkW)
                                                 </div>
                                             </div>
-
-                                            <div t-if="record.compactness and record.compactness.raw_value"
-                                                 class="mt-1">
-                                                Compactness: <t t-esc="record.compactness.value"/>
-                                            </div>
-
-                                            <footer>
-                                                <div/>
-                                            </footer>
                                         </main>
                                     </t>
                                 </templates>
                             </kanban>
+
+                            <!-- INLINE FORM SUBVIEW (used when clicking a card) -->
+                            <form>
+                                <sheet string="EP Information">
+                                    <group>
+                                        <group>
+                                            <field name="partner_id" readonly="1"/>
+                                            <field name="recording_date"/>
+                                            <field name="certificate_holder"/>
+                                            <field name="status"/>
+                                            <field name="based_on_reference_building"/>
+                                            <field name="building_type"/>
+                                            <field name="postal_code"/>
+                                            <field name="house_letter"/>
+                                            <field name="bag_residence_id"/>
+                                            <field name="construction_year"/>
+                                            <field name="usable_area"/>
+                                            <field name="energy_label"/>
+                                            <field name="primary_fossil_energy"/>
+                                            <field name="renewable_energy_share"/>
+                                            <field name="heat_demand"/>
+                                            <field name="calculated_energy_consumption"/>
+                                        </group>
+                                        <group>
+                                            <field name="registration_date"/>
+                                            <field name="valid_until"/>
+                                            <field name="recording_type"/>
+                                            <field name="calculation_type"/>
+                                            <field name="building_class"/>
+                                            <field name="building_subtype"/>
+                                            <field name="house_number"/>
+                                            <field name="house_number_addition"/>
+                                            <field name="bag_building_ids"/>
+                                            <field name="usable_area_thermal_zone"/>
+                                            <field name="compactness"/>
+                                            <field name="energy_demand"/>
+                                            <field name="primary_fossil_energy_emg_default"/>
+                                            <field name="temperature_exceedance"/>
+                                            <field name="calculated_co2_emission"/>
+                                        </group>
+                                    </group>
+                                    <group>
+                                        <separator string="calculated vales"/>
+                                    </group>
+                                    <group>
+                                        <group>
+                                            <field name="indoor_temp"/>
+                                            <field name="outdoor_design_temp"/>
+                                            <field name="margin_percent_kw"/>
+                                        </group>
+                                        <group>
+                                            <field name="delta_t"/>
+                                            <field name="design_kw"/>
+                                            <field name="specific_power_w_m2"/>
+                                        </group>
+                                    </group>
+
+                                </sheet>
+                            </form>
+
                         </field>
                     </page>
                 </xpath>
+
             </field>
         </record>
+
     </data>
 </odoo>

@@ -1,12 +1,13 @@
-# odoo-sh-project
-This repository contains the `custom_sale_document` addon. It enhances the sales
-workflow by generating structured PDF documents for quotations, invoices and
-service contracts. The module adds fields for marketing kits, subsidies and
-other contract information.
+# sale_multi_proposal
 
-## Module Installation
+Addon to manage multiple proposal quotations in Odoo 18.
 
-Copy the `custom_sale_document` directory into your Odoo `addons` path and
-update the app list. After installation you can configure additional fields on
-sale orders, invoices and kits. The provided QWeb templates serve as a starting
-point for custom PDF layouts.
+- **New Proposal** button → create proposal from main quotation.
+- **Proposal fields** on sale order: is_proposal, parent, state, count.
+- **Smart button** → view all proposals of a main quotation.
+- **Accept Proposal wizard**:
+  - Marks proposal as Accepted.
+  - Updates parent quotation with proposal lines.
+  - If parent is draft/sent → replace lines.
+  - If parent is confirmed → set old lines qty=0, then add proposal lines.
+- **Service layer** (`sale.proposal.service`) handles duplication safely.

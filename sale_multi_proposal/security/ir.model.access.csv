@@ -1,3 +1,3 @@
 id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
-access_sale_order_proposal_user,sale.order.proposal.user,sale.model_sale_order,sales_team.group_sale_salesman,1,1,1,1
-access_sale_order_line_proposal_user,sale.order.line.proposal.user,sale.model_sale_order_line,sales_team.group_sale_salesman,1,1,1,1
+access_sale_order_proposal_user,sale.order proposal user,model_sale_order,,1,1,1,1
+access_sale_proposal_accept_wizard,sale.proposal.accept.wizard,model_sale_proposal_accept_wizard,,1,1,1,1

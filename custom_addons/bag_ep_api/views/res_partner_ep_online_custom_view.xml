@@ -11,9 +11,8 @@
 
                 <!-- Insert a new page into the notebook -->
                 <xpath expr="//form//sheet//notebook" position="inside">
-                    <!--          <page string="Ep Online" name="ep_online" attrs="{'invisible':[('is_company','=',True)]}">-->
 
-                    <page string="Ep Online" name="ep_online">
+                    <page string="Ep Online" name="ep_online" invisble="is_company ==True">
 
                         <!-- Optional: action button -->
                         <div class="oe_button_box" name="button_box">
@@ -22,7 +21,7 @@
                         </div>
 
                         <!-- One2many shown as Kanban with inline Form (opens on click) -->
-                        <field name="ep_data_ids" mode="kanban">
+                        <field name="ep_data_ids" mode="kanban" create="false" delete="false">
 
                             <!-- KANBAN SUBVIEW -->
                             <kanban sample="1" create="false" edit="false" delete="false"
@@ -35,9 +34,9 @@
                                 <field name="energy_label"/>
                                 <field name="usable_area"/>
                                 <field name="usable_area_thermal_zone"/>
-                                <field name="compactness"/>
                                 <field name="design_kw"/>
                                 <field name="outdoor_design_temp"/>
+                                <field name="design_heat_square_m2"/>
 
                                 <templates>
                                     <t t-name="card" class="flex-row p-2">
@@ -47,11 +46,15 @@
 
                                         <main class="ps-2">
                                             <div class="mb-1">
-                                                <div class="fw-bold">Building</div>
+                                                <div class="fw-bold">Building
+                                                    <t t-if="record.energy_label and record.energy_label.raw_value != null">
+                                                        — Energylabel: <t t-esc="record.energy_label.value"/>
+                                                    </t>
+                                                </div>
 
                                                 <div t-if="record.construction_year and record.construction_year.raw_value != null"
                                                      class="mt-1">
-                                                    <t t-translation="yes">Construction Year</t>:
+                                                    <t t-translation="yes">Construction year</t>:
                                                     <t t-esc="record.construction_year.raw_value"/>
                                                 </div>
 
@@ -79,7 +82,7 @@
                                                     OutDoor: <t t-esc="record.outdoor_design_temp.value"/> (°C)
                                                 </div>
                                                 <div t-if="record.design_kw and record.design_kw.raw_value != null">
-                                                    Design Capacity: <t t-esc="record.design_kw.value"/> (pkW)
+                                                    Design capacity: <t t-esc="record.design_kw.value"/> (pkW)
                                                 </div>
                                             </div>
                                         </main>
@@ -88,7 +91,7 @@
                             </kanban>
 
                             <!-- INLINE FORM SUBVIEW (used when clicking a card) -->
-                            <form>
+                            <form create="false" delete="false">
                                 <sheet string="EP Information">
                                     <group>
                                         <group>
@@ -139,7 +142,7 @@
                                         <group>
                                             <field name="delta_t"/>
                                             <field name="design_kw"/>
-                                            <field name="specific_power_w_m2"/>
+                                            <field name="design_heat_square_m2"/>
                                         </group>
                                     </group>
 

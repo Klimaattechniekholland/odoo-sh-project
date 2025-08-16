@@ -70,8 +70,8 @@ class EpData(models.Model):
 		readonly = True,
 		)
 	
-	specific_power_w_m2 = fields.Float(
-		string = "Specific power (W/m²)",
+	design_heat_square_m2 = fields.Float(
+		string = "Design Heat (W/m²)",
 		compute = "_compute_design_heat_square_m2",
 		store = True,
 		readonly = True,
@@ -197,7 +197,7 @@ class EpData(models.Model):
 			except Exception:
 				value = 0.0
 			
-			rec.specific_power_w_m2 = value
+			rec.design_heat_square_m2 = value
 	
 	
 	@api.depends('full_load_hours', 'energy_demand', 'usable_area_thermal_zone')

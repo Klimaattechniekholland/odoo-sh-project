@@ -60,6 +60,8 @@ class EpData(models.Model):
 	margin_percent_kw = fields.Float(string = "Marge (%)", default = 10.0)
 	full_load_hours = fields.Float(string = "Annual Full Load (h)", default = 1650.0)
 	
+	note = fields.Char(string = _("Note"))
+	
 	# ----------------------------
 	# Computed: power  and specific power
 	# -------------------------
@@ -141,8 +143,8 @@ class EpData(models.Model):
 				rec.delta_t = 0.0  # safe fallback
 	
 	
-	@api.depends('hdd_value', 'delta_t', 'margin_percent_kw')
-	def _compute_design_ep_heat_loss(self, is_kw = True):
+	@api.depends('hdd_value', 'delta_t', 'margin_percent_kw', 'annual_heat_consumption')
+	def _compute_design_ep_heat_loss(self):
 		"""
         Design heat loss:
             base = (annual_heat_consumption * ΔT) / (HDD * 24)

@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+  <record id="view_res_config_settings_kth_web_bridge" model="ir.ui.view">
+    <field name="name">res.config.settings.kth.web.bridge</field>
+    <field name="model">res.config.settings</field>
+    <field name="inherit_id" ref="base.view_res_config_settings"/>
+    <field name="arch" type="xml">
+      <xpath expr="//div[@id='settings']" position="inside">
+        <div class="app_settings_block" data-string="Web Lead API" string="Web Lead API">
+          <h2>Web Lead API</h2>
+          <div class="row mt16 o_settings_container">
+            <div class="col-12 col-lg-6">
+              <div class="o_setting_box">
+                <div class="o_setting_left_pane">
+                  <field name="kth_api_token" password="True"/>
+                </div>
+                <div class="o_setting_right_pane">
+                  <label for="kth_api_token"/>
+                  <div class="text-muted">Set a strong token to be used by Forminator.</div>
+                  <div class="text-muted">Endpoint: <code>/api/web_leads</code></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </xpath>
+    </field>
+  </record>
+</odoo>

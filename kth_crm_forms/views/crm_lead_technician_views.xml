@@ -10,7 +10,6 @@
                         type="object"
                         string="Technician Portal"
                         class="btn btn-primary"
-                        attrs="{'invisible': [('stage_id.name', 'not in', ['Installation', 'Completion & Handover'])]}"/>
             </xpath>
             <xpath expr="//sheet/notebook" position="inside">
                 <page string="Technician Report">

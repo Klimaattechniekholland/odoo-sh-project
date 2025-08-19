@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <record id="view_crm_lead_form_inherit_kth_button" model="ir.ui.view">
+        <field name="name">crm.lead.form.kth.portalbutton</field>
+        <field name="model">crm.lead</field>
+        <field name="inherit_id" ref="crm.crm_lead_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//header" position="inside">
+                <button name="action_open_intake_portal"
+                        type="object"
+                        string="Open Intake Portal"
+                        class="oe_highlight"/>
+            </xpath>
+        </field>
+    </record>
+    <record id="view_crm_lead_form_kth_inherit" model="ir.ui.view">
+        <field name="name">crm.lead.form.kth.intake</field>
+        <field name="model">crm.lead</field>
+        <field name="inherit_id" ref="crm.crm_lead_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//sheet/notebook" position="inside">
+                <page string="Intake Details">
+                    <group>
+                        <field name="full_name"/>
+                        <field name="email_from"/>
+                        <field name="phone"/>
+                        <field name="address"/>
+                        <field name="zip_code"/>
+                        <field name="house_number"/>
+                        <separator string="Heat Pump"/>
+                        <field name="type_system"/>
+                        <field name="brand"/>
+                        <field name="floor_surface"/>
+                        <field name="type_heating"/>
+                        <field name="gas_consumption"/>
+                        <field name="energy_label"/>
+                        <field name="year_built"/>
+                        <field name="ventilation"/>
+                        <field name="members"/>
+                        <field name="average_usage"/>
+                        <field name="extra_notes"/>
+                        <separator string="Airco"/>
+                        <field name="airco_model"/>
+                        <field name="airco_capacity"/>
+                        <separator string="Service"/>
+                        <field name="service_contract_type"/>
+                        <separator string="Call‑Out"/>
+                        <field name="callout_issue"/>
+                    </group>
+                </page>
+            </xpath>
+        </field>
+    </record>
+</odoo>

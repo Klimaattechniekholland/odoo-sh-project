@@ -1,8 +1,8 @@
 {
-    "name": "KTH CRM Forms",
+    "name": "KTH CRM Forms and CRM Leads WP(Forminator)",
     "version": "1.0.0",
     "summary": "Dynamic forms and extended CRM lead fields for Klimaat Techniek Holland",
-    "description": "This module provides a modern, multi‑section portal forms for capturing stages informations from clients and technicians.  It extends the CRM lead model with additional fields derived from the intake questionnaire and creates all pipeline stages specified by the business.  The portal form supports English and Dutch languages and includes basic validation rules.",
+    "description": "This module provides a modern, multi‑section portal forms for capturing stages informations from clients and technicians.  It extends the CRM lead model with additional fields derived from the intake questionnaire and creates all pipeline stages specified by the business.  The portal form supports English and Dutch languages and includes basic validation rules. and Minimal WordPress → Odoo CRM lead intake (Forminator compatible)",
     "category": "CRM",
     "author": "Klimaat Techniek Holland",
     "website": "https://klimaattechniekholland.nl",

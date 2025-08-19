@@ -9,7 +9,7 @@
                 <button name="action_open_technician_portal"
                         type="object"
                         string="Technician Portal"
-                        class="btn btn-primary"
+                        class="btn btn-primary" />
             </xpath>
             <xpath expr="//sheet/notebook" position="inside">
                 <page string="Technician Report">

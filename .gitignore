@@ -1,0 +1,41 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# MacOS metadata
+.DS_Store
+
+# Backup files
+*~
+*.bak
+
+# Logs and session files
+*.log
+.local/
+
+# IDE/editor files
+.vscode/
+.idea/
+.tx/
+
+# Python virtual environments (if accidentally placed here)
+.env/
+venv/
+.envrc
+
+# Compiled translation files
+*.mo
+
+# Egg and pip build artifacts
+*.egg-info/
+dist/
+build/
+
+# Odoo specifics
+*.zip
+*.iml
+*.swp
+
+/clean_pyc.sh
+/translate_sync.sh

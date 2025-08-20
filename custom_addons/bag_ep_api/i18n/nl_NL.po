@@ -1,0 +1,206 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* bag_api
+#
+msgid ""
+msgstr "Project-Id-Version: Odoo Server 18.0+e-20250428\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-05-26 22:43+0000\n"
+"PO-Revision-Date: 2025-05-26 22:32+0000\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
+
+#. module: bag_api
+#: model:ir.model.fields,field_description:bag_api.field_res_partner__addressableObject
+#: model:ir.model.fields,field_description:bag_api.field_res_users__addressableObject
+msgid "Addressable Object"
+msgstr ""
+
+#. module: bag_api
+#: model:ir.model,name:bag_api.model_bag_api_client
+msgid "BAG API Client"
+msgstr ""
+
+#. module: bag_api
+#: model:ir.model.fields,field_description:bag_api.field_res_config_settings__api_key
+msgid "BAG API Key"
+msgstr ""
+
+#. module: bag_api
+#: model:ir.model,name:bag_api.model_bag_lookup_history
+msgid "BAG Lookup History"
+msgstr ""
+
+#. module: bag_api
+#: model:ir.ui.menu,name:bag_api.menu_bag_lookup_root
+msgid "Bag API"
+msgstr ""
+
+#. module: bag_api
+#: model:ir.actions.act_window,name:bag_api.action_bag_lookup_history
+#: model:ir.ui.menu,name:bag_api.menu_bag_lookup_history
+#: model_terms:ir.ui.view,arch_db:bag_api.view_bag_lookup_history_form
+#: model_terms:ir.ui.view,arch_db:bag_api.view_bag_lookup_history_tree
+msgid "Bag Lookup History"
+msgstr ""
+
+#. module: bag_api
+#: model:ir.model,name:bag_api.model_res_config_settings
+msgid "Config Settings"
+msgstr "Configuratie-instellingen"
+
+#. module: bag_api
+#: model:ir.model,name:bag_api.model_res_partner
+msgid "Contact"
+msgstr ""
+
+#. module: bag_api
+#: model_terms:ir.actions.act_window,help:bag_api.action_bag_lookup_history
+msgid "Create your first Bag Lookup History record"
+msgstr ""
+
+#. module: bag_api
+#: model:ir.model.fields,field_description:bag_api.field_bag_lookup_history__create_uid
+msgid "Created by"
+msgstr ""
+
+#. module: bag_api
+#: model:ir.model.fields,field_description:bag_api.field_bag_lookup_history__create_date
+msgid "Created on"
+msgstr ""
+
+#. module: bag_api
+#: model:ir.model.fields,field_description:bag_api.field_bag_lookup_history__date
+msgid "Date"
+msgstr ""
+
+#. module: bag_api
+#: model:ir.model.fields,field_description:bag_api.field_bag_lookup_history__display_name
+msgid "Display Name"
+msgstr ""
+
+#. module: bag_api
+#: model:ir.model,name:bag_api.model_ep_api_client
+msgid "Ep-Online API Client"
+msgstr ""
+
+#. module: bag_api
+#: model:ir.model.fields,field_description:bag_api.field_res_config_settings__exact_match
+msgid "Exact Match"
+msgstr ""
+
+#. module: bag_api
+#: model:ir.model.fields,field_description:bag_api.field_res_partner__house_number_extension
+#: model:ir.model.fields,field_description:bag_api.field_res_users__house_number_extension
+msgid "Extension"
+msgstr ""
+
+#. module: bag_api
+#: model:ir.model.fields.selection,name:bag_api.selection__bag_lookup_history__result_status__failure
+msgid "Failure"
+msgstr ""
+
+#. module: bag_api
+#: model:ir.model.fields.selection,name:bag_api.selection__bag_lookup_history__result_status__fallback
+msgid "Fallback"
+msgstr ""
+
+#. module: bag_api
+#: model:ir.model.fields,field_description:bag_api.field_bag_lookup_history__fallback_message
+msgid "Fallback Message"
+msgstr ""
+
+#. module: bag_api
+#: model:ir.model.fields,field_description:bag_api.field_res_partner__full_house_number
+#: model:ir.model.fields,field_description:bag_api.field_res_users__full_house_number
+msgid "Full Number"
+msgstr "Volledige nummer"
+
+#. module: bag_api
+#: model:ir.model.fields,field_description:bag_api.field_bag_lookup_history__id
+msgid "ID"
+msgstr ""
+
+#. module: bag_api
+#: model:ir.model.fields,field_description:bag_api.field_bag_lookup_history__write_uid
+msgid "Last Updated by"
+msgstr ""
+
+#. module: bag_api
+#: model:ir.model.fields,field_description:bag_api.field_bag_lookup_history__write_date
+msgid "Last Updated on"
+msgstr ""
+
+#. module: bag_api
+#: model:ir.model.fields,field_description:bag_api.field_res_partner__house_letter
+#: model:ir.model.fields,field_description:bag_api.field_res_users__house_letter
+msgid "Letter"
+msgstr ""
+
+#. module: bag_api
+#: model:ir.model.fields,field_description:bag_api.field_bag_lookup_history__lookup_date
+msgid "Lookup Date"
+msgstr ""
+
+#. module: bag_api
+#: model:ir.model.fields,field_description:bag_api.field_res_config_settings__max_retries
+msgid "Max Retries"
+msgstr ""
+
+#. module: bag_api
+#: model:ir.model.fields,field_description:bag_api.field_bag_lookup_history__name
+msgid "Name"
+msgstr ""
+
+#. module: bag_api
+#: model:ir.model.fields,field_description:bag_api.field_res_partner__house_number
+#: model:ir.model.fields,field_description:bag_api.field_res_users__house_number
+msgid "Number"
+msgstr "Nummer"
+
+#. module: bag_api
+#: model:ir.model.fields,field_description:bag_api.field_bag_lookup_history__partner_id
+msgid "Partner"
+msgstr "Partner"
+
+#. module: bag_api
+#: model_terms:ir.ui.view,arch_db:bag_api.view_partner_form_bag_api_button
+msgid "Perform BAG Lookup"
+msgstr ""
+
+#. module: bag_api
+#: model:ir.model.fields,field_description:bag_api.field_bag_lookup_history__result_status
+msgid "Result Status"
+msgstr "Status resultaat"
+
+#. module: bag_api
+#: model:ir.model.fields,field_description:bag_api.field_res_config_settings__retry_delay
+msgid "Retry Delay (seconds)"
+msgstr ""
+
+#. module: bag_api
+#: model:ir.model.fields.selection,name:bag_api.selection__bag_lookup_history__result_status__success
+msgid "Success"
+msgstr "Success"
+
+#. module: bag_api
+#. odoo-python
+#: code:addons/bag_api/models/res_partner.py:0
+msgid "The address with ZIP '%(zip)s' and number '%(number)s' was not found."
+msgstr "Het adres met postcode '%(zip)s' en huisnummer '%(number)s' is niet gevonden"
+
+#. module: bag_api
+#: model:ir.model,name:bag_api.model_zip_api_client
+msgid "ZIP API Client"
+msgstr "ZIP API Client"
+
+#. module: bag_api
+#: model:ir.model.fields,field_description:bag_api.field_res_partner__bag_lookup_done
+#: model:ir.model.fields,field_description:bag_api.field_res_users__bag_lookup_done
+msgid "Zip/Ep/Bag Lookup Done"
+msgstr "Zip/Ep/Bag lookup gedaan"

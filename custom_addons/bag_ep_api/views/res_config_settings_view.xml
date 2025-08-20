@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding = "utf-8"?>
+<odoo>
+    <record id="res_config_settings_view_form" model="ir.ui.view">
+
+        <field name="model">res.config.settings</field>
+        <field name="priority" eval="15"/>
+        <field name="inherit_id" ref="base.res_config_settings_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//form" position="inside">
+                <app data-string="Bag EP Settings"
+                     string="Bag EP Settings"
+                     icon="/static/description/icon.png"
+                     name="bag_ep_api">
+                    <!-- URL setting removed - static in de Code
+                    ZIP is completely disabled only one setting
+                    <block title="Zip Settings"
+                           name="zip_settings">
+                        <setting string="Open ZIP API URL"
+                                 help="URL to the BAG API endpoint."
+                                 id="zip_api_url_setting"
+                                 class="w-100">
+                            <field name="zip_api_url"/>
+                        </setting>
+                    </block>
+                    -->
+                    <block title="Bag Settings"
+                           name="bag_settings">
+                        <!-- URL setting removed - static in de Code
+                        <setting string="BAG API URL"
+                                 help="URL to the BAG API endpoint."
+                                 id="bag_api_url_setting"
+                                 class="w-100">
+                            <field name="bag_api_url"/>
+                        </setting>
+                        -->
+                        <setting string="BAG API Key"
+                                 help="BAG API key for authentication."
+                                 id="bag_api_key_setting"
+                                 class="w-100">
+                            <field name="bag_api_key" password="True"/>
+                        </setting>
+
+                        <setting string="BAG API Exact Match"
+                                 help="If the request must be exact."
+                                 id="bag_api_exact_match_setting">
+                            <field name="bag_api_exact_match"/>
+                        </setting>
+
+                    </block>
+
+                    <block title="EP Settings"
+                           name="bag_ep_settings">
+                        <!-- URL setting removed - static in de Code
+                        <setting string="EP API URL"
+                                 help="URL to the EP API endpoint."
+                                 id="ep_api_url_setting"
+                                 class="w-100">
+                            <field name="ep_api_url"/>
+                        </setting>
+                        -->
+                        <setting string="EP API Key"
+                                 help="EP API key for authentication."
+                                 id="ep_api_key_setting"
+                                 class="w-100">
+                            <field name="ep_api_key"/>
+                        </setting>
+
+                        <setting string="EP API RECREATE"
+                                 help="We recreate on the fly, single records, see doc for info"
+                                 id="ep_api_recreate_setting">
+                            <field name="ep_api_recreate"/>
+                        </setting>
+
+                        <setting string="EP API Show Warnings"
+                                 help="Show warnings"
+                                 id="ep_api_show_warnings_setting">
+                            <field name="ep_api_show_warnings"/>
+                        </setting>
+
+                    </block>
+                </app>
+            </xpath>
+        </field>
+    </record>
+</odoo>
+

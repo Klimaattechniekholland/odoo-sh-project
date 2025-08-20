@@ -1,0 +1,54 @@
+    # in res.partner# get address items from zip and full house number, for the Dutch market,
+
+	# country_id = 165, NL, The Netherlands.
+	# to get from the full house number: 70, 70 A, 70-1, 70A-1
+	# the number, 70
+	# optional letters, an
+	# optional extension, -1
+	# if the ZipData(BaseModel) is found then fill the fields bag_api for the street and city
+	# populates the result data in res.partner table/fields.
+	# with the ep-online call, we get all Energy Label information
+	# when the square meters or built year are not given by the ep-online
+	# use BagApi to get the information.
+	# the Zip information is a class (Basemodel), not stored in the database.
+	# the EpData information is a class (models.Model) with Many2One reference in res.partner
+	# and stored in the database.
+
+	#
+	# NOTE:
+	# do not use the raise User Error it will refill the form with the saved data.
+	#
+	# self.ep_data_ids = [(5, 0, 0)]
+	# self.ep_data_ids += [(0, 0, vals) for vals in filtered_vals]  - multiple records
+	# self.ep_data_ids += [(0, 0, filtered_vals)] - one record
+	#
+	# | Command | Format | Description |
+	# | ------- | ----------------- | ---------------------------------------------------------------------------- |
+	# | `0`     | `(0, 0, values)`  | Create a new record with the given `values` (dict of field values).|
+	# | `1`     | `(1, ID, values)` | Update the record with `ID` using the given `values`.|
+	# | `2`     | `(2, ID, 0)`      | Delete the record with `ID`.Only works on `One2many`.|
+	# | `3`     | `(3, ID, 0)`      | Unlink the  record with `ID` from the relation, but do not delete it.|
+	# | `4`     | `(4, ID, 0)`      | Link to an existing record  with `ID`.Does not create or update.|
+	# | `5`     | `(5, 0, 0)`       | Clear all existing records in the relation. | deprecated use (6, 0, [])
+	# | `6`     | `(6, 0, [IDs])`   | Replace al existing links with the provided list of IDs.|
+
+
+# compactheid = gebruiksoppervlak (GBO) / verlies oppervlak (A_Verlies)
+#      A_Verlies is de berekend verlies oppervlak van de buitenkant / gevel.
+#
+# Compactness = Usable area (GBO) / Surface of heat loss
+# Surface heat loss = surface of the oustside
+
+# energie behoefte is de totale energie per m2 per jaar.
+#
+
+# voor een warmte pomp reken je:
+#   kW per jaar  = warmtebehoefte  * oppervlakte
+#   kW-WP = kWpj / vollast uren.
+# Vollast uren zijn vast gesteld op gemiddlede van 1640 uur.
+# deze kan vaieren tussen 1000 en 2000 uur, geheel afhankelijk van de energieklasse.
+#
+# koelbehoefte = energiebehoefte - warmtebehoefte
+#
+# huishouden  ongeveer 5000 kWh per jaar
+# tapwater per jaar uirekenen
